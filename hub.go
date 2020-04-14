@@ -1,5 +1,7 @@
 package main
 
+import "log"
+
 // Hub maintains the set of active clients and broadcasts messages to the
 // clients.
 type Hub struct {
@@ -36,9 +38,14 @@ func (h *Hub) run() {
 				close(client.send)
 			}
 		case message := <-h.broadcast:
+			log.Printf("Received a message from the client %v", message)
+
+			// Here we are looping on all clients and sending
+			// back the message we received from one client
 			for client := range h.clients {
 				select {
 				case client.send <- message:
+					log.Printf("Sent same message back to the client %v", message)
 				default:
 					close(client.send)
 					delete(h.clients, client)
