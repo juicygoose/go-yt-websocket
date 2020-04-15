@@ -42,6 +42,9 @@ type Client struct {
 
 	// Buffered channel of outbound messages.
 	send chan []byte
+
+	// Client master or not
+	master bool
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -66,7 +69,9 @@ func (c *Client) readPump() {
 			break
 		}
 		message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
-		c.hub.broadcast <- message
+		// here we send to the channel a broadcast object with message
+		// and client (so that we can identify if this client is master)
+		c.hub.broadcast <- &Broadcast{message: message, client: c}
 	}
 }
 
@@ -123,8 +128,18 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+
+	// We want to have a master client driving what is happening
+	// On the music player side
+	// A default master is the first client connected
+	master := true
+	if len(hub.clients) >= 1 {
+		log.Printf("Client will not be master")
+		master = false
+	}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), master: master}
 	client.hub.register <- client
+	log.Printf("Client has been registered!")
 
 	// Allow collection of memory referenced by the caller by doing all work in
 	// new goroutines.

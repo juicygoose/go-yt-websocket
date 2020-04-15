@@ -1,0 +1,17 @@
+html {
+    display: table;
+    margin: auto;
+}
+body {
+    display: table-cell;
+    vertical-align: middle;
+    background-color: #9afcaf; 
+}
+
+.row {
+    display: flex;
+  }
+  
+.column {
+    flex: 50%;
+}

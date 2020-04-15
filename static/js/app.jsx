@@ -6,7 +6,7 @@ var App = React.createClass({
       if (this.loggedIn) {
         return (<LoggedIn />);
       } else {
-        return (<LoggedIn />);
+        return (<Home />);
       }
     }
   });
