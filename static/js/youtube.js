@@ -1,3 +1,58 @@
+// Global var that has the information about the video
+var youtubeVideoId = 'BPkZ7xr7qJ0';
+var input = document.getElementById("input");
+var output = document.getElementById("output");
+var hostname = window.location.hostname
+var port = window.location.port
+var socket = new WebSocket("ws://" + hostname + ":" + port + "/echo");
+
+socket.onopen = function () {
+    document.getElementById('output').innerHTML += "Status: Connected\n";
+};
+
+socket.onmessage = function (e) {
+    if (e.data.includes('videoId')) {
+        obj = JSON.parse(e.data)
+        
+        document.getElementById('output').innerHTML += "This is the json with video id: " + obj.videoId + " \n";
+        if (obj.videoId == youtubeVideoId) {
+            document.getElementById('output').innerHTML += "Nothing to do as the video playing is the same than video received\n";
+        }
+        else {
+            youtubeVideoId = obj.videoId;
+            changeVideo(youtubeVideoId);
+        }
+    }
+    else if (e.data.includes('playerState')) {
+        obj = JSON.parse(e.data);
+        if (obj.playerState == YT.PlayerState.PLAYING) {
+            player.playVideo();
+        }
+        if (obj.playerState == YT.PlayerState.PAUSED) {
+            player.pauseVideo();
+        }
+    }
+
+    document.getElementById('output').innerHTML += "Server: " + e.data + "\n";
+};
+
+function send() {
+    socket.send(input.value);
+    input.value = "";
+}
+
+function requestMaster() {
+    socket.send('masterRequest')
+}
+
+
+function changeVideo(youtubeVideoId) {
+    socket.send('{"videoId": "' + youtubeVideoId + '"}')
+    player.loadVideoById(youtubeVideoId);
+    player.playVideo()
+}
+
+
 // 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement('script');
 

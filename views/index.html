@@ -1,82 +1,112 @@
-<!-- <link rel="stylesheet" href="static/css/canva.css"> -->
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hacienda</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script src="static/js/youtube.js" type="text/javascript"></script>
+    <script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>
+  </head>
+  <body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+        <div class="navbar-brand">
+          <a class="navbar-item">
+            <img src="https://www.pinpng.com/pngs/m/3-30067_download-vinyl-record-png-images-background-record-jpg.png" width="35" height="35">
+          </a>
+      
+          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+          </a>
+        </div>
+      
+        <div id="navbarBasicExample" class="navbar-menu">
+          <div class="navbar-start">
+            <a class="navbar-item">
+              Home
+            </a>
+      
+            <a class="navbar-item">
+              Documentation
+            </a>
+      
+            <div class="navbar-item has-dropdown is-hoverable">
+              <a class="navbar-link">
+                More
+              </a>
+      
+              <div class="navbar-dropdown">
+                <a class="navbar-item">
+                  About
+                </a>
+                <a class="navbar-item">
+                  Jobs
+                </a>
+                <a class="navbar-item">
+                  Contact
+                </a>
+                <hr class="navbar-divider">
+                <a class="navbar-item">
+                  Report an issue
+                </a>
+              </div>
+            </div>
+          </div>
+      
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="buttons">
+                <a class="button is-primary">
+                  <strong>Sign up</strong>
+                </a>
+                <a class="button is-light">
+                  Log in
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </nav>
+  <section class="hero">
+    <div class="container">
 
-<div id="player"></div>
-<div/>
-
-
-
-<div class="row">
-    <div class="column">
-        <input id="input" type="text" />
-        <button onclick="send()">Send</button>
-        <pre id="output"></pre>
+  
+        <div class="columns">
+          <div class="column">
+            <article class="message is-primary">
+                <div class="message-header">
+                  <p>Playing track</p>
+                </div>
+                <div class="message-body">
+                    <div id="player"></div>
+                </div>
+              </article>
+          </div>
+          <div class="column">
+              <input id="input" type="text" />
+              <button onclick="send()">Send</button>
+              <pre id="output"></pre>
+          </div>
+          <div class="column">
+              <div class="columns" id="dynCol">
+                <div class="column">1</div>
+              </div>
+              <input id="query" value='cats' type="text"/>
+              <button onclick="search()">Search</button>
+              <pre id="response"></pre>
+          </div>
+  
+        </div>
     </div>
-    <div class="column">
-        <input id="query" value='cats' type="text"/>
-        <button onclick="search()">Search</button>
-        <pre id="response"></pre>
+    <div class="container">
+        <button class="button is-primary" onclick="requestMaster()">
+            Request master!
+          </button>
     </div>
-</div>
+  </section>
 
-
-<div class="container" id="app"></div>
-
-<script>
-    // Global var that has the information about the video
-    var youtubeVideoId = 'BPkZ7xr7qJ0';
-    var input = document.getElementById("input");
-    var output = document.getElementById("output");
-    var hostname = window.location.hostname
-    var port = window.location.port
-    var socket = new WebSocket("ws://" + hostname + ":" + port + "/echo");
-
-    socket.onopen = function () {
-        output.innerHTML += "Status: Connected\n";
-    };
-
-    socket.onmessage = function (e) {
-        if (e.data.includes('videoId')) {
-            obj = JSON.parse(e.data)
-            output.innerHTML += "This is the json with video id: " + obj.videoId + " \n";
-            if (obj.videoId == youtubeVideoId) {
-                output.innerHTML += "Nothing to do as the video playing is the same than video received\n";
-            }
-            else {
-                youtubeVideoId = obj.videoId;
-                changeVideo(youtubeVideoId);
-            }
-        }
-        else if (e.data.includes('playerState')) {
-            obj = JSON.parse(e.data);
-            if (obj.playerState == YT.PlayerState.PLAYING) {
-                player.playVideo();
-            }
-            if (obj.playerState == YT.PlayerState.PAUSED) {
-                player.pauseVideo();
-            }
-        }
-
-        output.innerHTML += "Server: " + e.data + "\n";
-    };
-
-    function send() {
-        socket.send(input.value);
-        input.value = "";
-    }
-
-    function requestMaster() {
-        socket.send('masterRequest')
-    }
-
-
-    function changeVideo(youtubeVideoId) {
-        socket.send('{"videoId": "' + youtubeVideoId + '"}')
-        player.loadVideoById(youtubeVideoId);
-        player.playVideo()
-    }
-
-</script>
-<script src="static/js/youtube.js" type="text/javascript"></script>
-<script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>
-<script type="text/babel" src="static/js/app.jsx"></script>
+  </body>
+</html>
