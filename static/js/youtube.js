@@ -4,7 +4,7 @@ var input = document.getElementById("input");
 var output = document.getElementById("output");
 var hostname = window.location.hostname
 var port = window.location.port
-var socket = new WebSocket("ws://" + hostname + ":" + port + "/echo");
+var socket = new WebSocket("wss://" + hostname + ":" + port + "/echo");
 
 socket.onopen = function () {
     document.getElementById('output').innerHTML += "Status: Connected\n";
