@@ -88,8 +88,6 @@ function onPlayerReady(event) {
 //    the player should play for six seconds and then stop.
 function onPlayerStateChange(event) {
     socket.send('{"playerState": ' + event.data + '}')
-    //socket.emit('my_event', {data: 'Player state changed!'});
-    //socket.emit('play_pause', {data: event.data});
 }
 
 // Your use of the YouTube API must comply with the Terms of Service:

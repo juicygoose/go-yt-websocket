@@ -81,6 +81,7 @@ func (h *Hub) run() {
 	}
 }
 
+// This method sets all clients connected as not being master
 func resetMaster(clients map[*Client]bool) bool {
 	for client := range clients {
 		client.master = false
