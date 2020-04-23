@@ -72,8 +72,6 @@
       </nav>
   <section class="hero">
     <div class="container">
-
-  
         <div class="columns">
           <div class="column">
             <article class="message is-primary">
@@ -86,26 +84,39 @@
               </article>
           </div>
           <div class="column">
-              <input id="input" type="text" />
-              <button onclick="send()">Send</button>
-              <pre id="output"></pre>
+            <article class="message is-primary">
+                <div class="message-header">
+                    <div class="field has-addons">
+                        <div class="control">
+                          <input class="input" id="query" type="text" placeholder="Find a track">
+                        </div>
+                        <div class="control">
+                            <button onclick="search()" class="button is-info">Search</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-body" id="response">
+                </div>
+            </article>
+
           </div>
-          <div class="column">
-              <div class="columns" id="dynCol">
-                <div class="column">1</div>
-              </div>
-              <input id="query" value='cats' type="text"/>
-              <button onclick="search()">Search</button>
-              <pre id="response"></pre>
-          </div>
-  
         </div>
     </div>
-    <div class="container">
+
+    <div class="container is-centered">
         <button class="button is-primary" onclick="requestMaster()">
             Request master!
           </button>
     </div>
+
+    <article class="message is-info">
+        <div class="message-header">
+            <p>Websocket logs</p>
+        </div>
+        <div class="message-body" id="output">
+        </div>
+    </article>
+
   </section>
 
   </body>

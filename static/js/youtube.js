@@ -4,10 +4,17 @@ var input = document.getElementById("input");
 var output = document.getElementById("output");
 var hostname = window.location.hostname
 var port = window.location.port
-var socket = new WebSocket("wss://" + hostname + ":" + port + "/echo");
+var websocket_protocol = "wss"
+
+// Handle local dev cases
+if (port.includes('80')) {
+    websocket_protocol = "ws"
+}
+
+var socket = new WebSocket(websocket_protocol + "://" + hostname + ":" + port + "/echo");
 
 socket.onopen = function () {
-    document.getElementById('output').innerHTML += "Status: Connected\n";
+    document.getElementById('output').innerHTML += "<p>Status: Connected</p>";
 };
 
 socket.onmessage = function (e) {
@@ -33,7 +40,7 @@ socket.onmessage = function (e) {
         }
     }
 
-    document.getElementById('output').innerHTML += "Server: " + e.data + "\n";
+    document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
 function send() {
@@ -114,6 +121,15 @@ function search() {
 }
 // Triggered by this line: request.execute(onSearchResponse);
 function onSearchResponse(response) {
+    document.getElementById('response').innerHTML = '';
     var responseString = JSON.stringify(response, '', 2);
-    document.getElementById('response').innerHTML = responseString;
+    results = response.items;
+    console.log(results);
+    for(var i = 0; i < results.length; i++) {
+        var result = results[i];
+
+        document.getElementById('response').innerHTML += '<p>' + result.id.videoId + ' : ' + result.snippet.title + '</p>';
+        
+    }
+    // document.getElementById('response').innerHTML = responseString;
 }
