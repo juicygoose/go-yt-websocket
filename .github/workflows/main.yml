@@ -27,3 +27,4 @@ jobs:
         name: juicygoose/hacienda
         username: juicygoose
         password: ${{ secrets.DOCKER_PASSWORD }}
+        tag_semver: alpha-0.1
