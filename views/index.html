@@ -3,121 +3,109 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hacienda</title>
+    <title>HWP</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script src="static/js/youtube.js" type="text/javascript"></script>
     <script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>
   </head>
   <body>
-    <nav class="navbar" role="navigation" aria-label="main navigation">
-        <div class="navbar-brand">
-          <a class="navbar-item">
-            <img src="https://www.pinpng.com/pngs/m/3-30067_download-vinyl-record-png-images-background-record-jpg.png" width="35" height="35">
-          </a>
-      
-          <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-            <span aria-hidden="true"></span>
-          </a>
+  <section class="hero is-fullheight is-primary is-bold">
+    <div class="hero-body has-text-centered">
+        <div class="container">
+            <h1 class="title">
+              Hacienda Warehouse Project
+            </h1>
+            <h2 class="subtitle">
+              Welcome to the Hacienda, enjoy!
+            </h2>
         </div>
-      
-        <div id="navbarBasicExample" class="navbar-menu">
-          <div class="navbar-start">
-            <a class="navbar-item">
-              Home
-            </a>
-      
-            <a class="navbar-item">
-              Documentation
-            </a>
-      
-            <div class="navbar-item has-dropdown is-hoverable">
-              <a class="navbar-link">
-                More
-              </a>
-      
-              <div class="navbar-dropdown">
-                <a class="navbar-item">
-                  About
-                </a>
-                <a class="navbar-item">
-                  Jobs
-                </a>
-                <a class="navbar-item">
-                  Contact
-                </a>
-                <hr class="navbar-divider">
-                <a class="navbar-item">
-                  Report an issue
-                </a>
-              </div>
-            </div>
-          </div>
-      
-          <div class="navbar-end">
-            <div class="navbar-item">
-              <div class="buttons">
-                <a class="button is-primary">
-                  <strong>Sign up</strong>
-                </a>
-                <a class="button is-light">
-                  Log in
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
-  <section class="hero">
-    <div class="container">
-        <div class="columns">
-          <div class="column">
-            <article class="message is-primary">
-                <div class="message-header">
-                  <p>Playing track</p>
-                </div>
-                <div class="message-body">
-                    <div id="player"></div>
-                </div>
-              </article>
-          </div>
-          <div class="column">
-            <article class="message is-primary">
-                <div class="message-header">
+    </div>
+    <div class="hero-body">
+        <div class="tile is-ancestor">
+            <div class="tile is-vertical is-8">
+              <div class="tile">
+                <div class="tile is-parent has-text-centered">
+                  <article class="tile is-child notification is-primary">
+                    <!-- <p class="title"></p>
+                    <p class="subtitle">Top tile</p> -->
                     <div class="field has-addons">
                         <div class="control">
                           <input class="input" id="query" type="text" placeholder="Find a track">
                         </div>
                         <div class="control">
-                            <button onclick="search()" class="button is-info">Search</button>
+                            <button onclick="search()" class="button is-warning" id="search-button">Search</button>
                         </div>
                     </div>
+                    <div class="table-container">
+                        <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth">
+                            <tbody  id="response">
+                            </tbody>
+                        </table>
+                    </div>
+                  </article>
                 </div>
-                <div class="message-body" id="response">
-                </div>
-            </article>
+                <div class="tile is-parent has-text-centered">
 
-          </div>
+                  <article class="tile is-child notification is-primary">
+                    <!-- <p class="title">Tra</p>
+                    <p class="subtitle">With an image</p> -->
+                    <div id="player"></div>
+                    <div class="container is-centered">
+                        <button class="button is-warning" onclick="requestMaster()">
+                            Request master!
+                          </button>
+                      </div>
+                  </article>
+
+                </div>
+              </div>
+              <div class="tile is-parent">
+                <article class="tile is-child notification is-danger">
+                  <p class="title">Wide tile</p>
+                  <p class="subtitle">Aligned with the right tile</p>
+                  <div class="content">
+                    <!-- Content -->
+                  </div>
+                </article>
+              </div>
+            </div>
+            <div class="tile is-parent">
+              <article class="tile is-child notification is-primary">
+                <div class="content">
+                  <p class="title">Tall tile</p>
+                  <p class="subtitle">With even more content</p>
+                  <div class="content">
+                    <!-- Content -->
+                  </div>
+                </div>
+              </article>
+            </div>
         </div>
     </div>
-
-    <div class="container is-centered">
-        <button class="button is-primary" onclick="requestMaster()">
-            Request master!
-          </button>
+    
+    <div class="hero-body">
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <article class="tile is-child notification is-info">
+                <div class="content">
+                    <!-- <p class="title">Tall tile</p> -->
+                    <p class="subtitle">Websockets logs</p>
+                    <div class="content" id="output">
+                    </div>
+                </div>
+                </article>
+            </div>
+        </div>
     </div>
-
-    <article class="message is-info">
-        <div class="message-header">
-            <p>Websocket logs</p>
-        </div>
-        <div class="message-body" id="output">
-        </div>
-    </article>
-
   </section>
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Hacienda</strong> by Alex.
+      </p>
+    </div>
+  </footer>
 
   </body>
 </html>
