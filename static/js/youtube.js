@@ -7,6 +7,10 @@ var port = window.location.port
 var websocket_protocol = "wss"
 var nextVideos = []
 
+function setTagNumberOfTracks() {
+    document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
+}
+
 
 // Handle local dev cases
 if (port.includes('80')) {
@@ -17,30 +21,53 @@ var socket = new WebSocket(websocket_protocol + "://" + hostname + ":" + port + 
 
 socket.onopen = function () {
     document.getElementById('output').innerHTML += "<p>Status: Connected</p>";
+    socket.send('readonlyGetNextVideos');
 };
 
 socket.onmessage = function (e) {
     if (e.data.includes('YouAreMaster')) {
         document.getElementById('output').innerHTML += "You are now the master";
-        document.getElementById('masterStatus').innerHTML = `<span class="tag is-success is-light is-medium">You are the master</span>`;
+        if (document.getElementById('keepPreviousPlaylistCheckbox').checked) {
+            document.getElementById('output').innerHTML += "Keeping playlist";
+        } else {
+            document.getElementById('output').innerHTML += "Resetting playlist";
+            nextVideos = [];
+        }
+        document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the master</span>`;
+        setTagNumberOfTracks();
     }
     if (e.data.includes('YouAreNotMaster')) {
         document.getElementById('output').innerHTML += "You are now NOT the master";
         document.getElementById('masterStatus').innerHTML = `
-        <button class="button is-warning is-light" onclick="requestMaster()">
+        <button class="button is-warning" onclick="requestMaster()">
             Request master
         </button>
+        <label class="checkbox">
+            <input type="checkbox" id="keepPreviousPlaylistCheckbox">
+            Keep playlist from previous master
+        </label>
         `;
         document.getElementById('masterRequest').innerHTML = ``;
+        // Get playlist in case it was reset by new master
+        socket.send('readonlyGetNextVideos');
     }
     if (e.data.includes('ClientIsRequestingMaster')) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
         document.getElementById('masterRequest').innerHTML = `
-        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept client request to become master</button>
+        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept client request to transfer master</button>
         `;
     }
+    if (e.data.includes('readonlyGetNextVideos')) {
+        var nextVideosMsg = `{"nextVideos": ${JSON.stringify(nextVideos)}}`;
+        socket.send(nextVideosMsg);
+    }
+    if (e.data.includes('nextVideos')) {
+        obj = JSON.parse(e.data);
+        nextVideos = obj.nextVideos;
+        setTagNumberOfTracks();
+    }
     if (e.data.includes('playVideoId')) {
-        obj = JSON.parse(e.data)
+        obj = JSON.parse(e.data);
         
         document.getElementById('output').innerHTML += "This is the json with video id: " + obj.playVideoId + " \n";
         if (obj.playVideoId == youtubeVideoId) {
@@ -63,7 +90,7 @@ socket.onmessage = function (e) {
         if (obj.playerState == YT.PlayerState.ENDED) {
             if (nextVideos.length >= 1) {
                 changeVideo(nextVideos.shift());
-                document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-success">${nextVideos.length} track(s) playing next</span>`;
+                setTagNumberOfTracks();
             }
             else {
                 // Stay ended I guess
@@ -74,7 +101,7 @@ socket.onmessage = function (e) {
         obj = JSON.parse(e.data);
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
         nextVideos.push(obj.cueVideoId);
-        document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-success">${nextVideos.length} track(s) playing next</span>`;
+        setTagNumberOfTracks();
     }
 
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
@@ -156,7 +183,7 @@ function search() {
     var request = gapi.client.youtube.search.list({
         part: 'snippet',
         q:query,
-        maxResults:4
+        maxResults:6
     });
     // Send the request to the API server, call the onSearchResponse function when the data is returned
     request.execute(onSearchResponse);

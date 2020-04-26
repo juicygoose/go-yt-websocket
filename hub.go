@@ -78,15 +78,21 @@ func (h *Hub) run() {
 				}
 			}
 
+			masterClient := getMasterClient(h.clients)
 			if strings.Contains(string(message), "masterRequest") {
 				clientRequestingMaster = broadcast.client
 				log.Printf("Client is requesting control!!!")
 				// Lets contact master to get his agreement
-				if masterClient := getMasterClient(h.clients); masterClient != nil {
+				if masterClient != nil {
 					masterClient.send <- []byte("ClientIsRequestingMaster")
 				} else {
 					// No master meaning that client can safely become master
 					setClientAsMaster(clientRequestingMaster)
+				}
+			} else if strings.Contains(string(message), "readonly") {
+				if masterClient != nil {
+					log.Printf("Sent readonly message to master: %v", string(message))
+					masterClient.send <- message
 				}
 			}
 		}

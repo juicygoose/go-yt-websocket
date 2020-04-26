@@ -10,7 +10,7 @@
     <script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>
   </head>
   <body>
-  <section class="hero is-primary is-bold">
+  <section class="hero is-bold">
     <div class="hero-body">
         <div class="container">
             <h1 class="title">
@@ -23,15 +23,13 @@
     </div>
     <div class="hero-body">
         <div class="tile is-ancestor">
-            <div class="tile is-vertical is-8">
+            <div class="tile is-vertical is-9">
               <div class="tile">
-                <div class="tile is-parent has-text-centered">
+                <div class="tile is-parent has-text-centered  is-4">
                   <article class="tile is-child notification is-primary">
-                    <!-- <p class="title"></p>
-                    <p class="subtitle">Top tile</p> -->
                     <div class="field has-addons">
                         <div class="control">
-                          <input class="input" id="query" type="text" placeholder="Find a track">
+                        <input class="input" id="query" type="text" placeholder="Find a track">
                         </div>
                         <div class="control">
                             <button onclick="search()" class="button is-warning" id="search-button">Search</button>
@@ -56,12 +54,16 @@
                             <span class="tag is-success">0 track(s) playing next</span>
                         </article>
                         <article class="tile is-child notification is-primary" id="masterStatus">
-                            <button class="button is-warning is-light" onclick="requestMaster()">
+                            <button class="button is-warning" onclick="requestMaster()">
                                 Request master
                             </button>
+                            <label class="checkbox">
+                                <input type="checkbox" id="keepPreviousPlaylistCheckbox">
+                                Keep playlist from previous master
+                            </label>
                         </article>
                         <article class="tile is-child notification is-primary">
-                            <span class="tag is-info">0 clients connected</span>
+                            <span class="tag is-light">N guys connected</span>
                         </article>   
                     </div>
 
@@ -75,14 +77,26 @@
                 </div>
               </div>
             </div>
-            <div class="tile is-parent">
+            <div class="tile is-parent is-vertical">
               <article class="tile is-child notification is-primary">
-                <div class="content">
-                  <p class="title">Tall tile</p>
-                  <p class="subtitle">With even more content</p>
-                  <div class="content">
-                    <!-- Content -->
-                  </div>
+                <p class="subtitle">Chatroom</p>
+                <article class="tile is-parent is-vertical">
+                    <article class="message is-primary">
+                        <div class="message-body">
+                          <p>New text</p>
+                          <p>Another text</p>
+                        </div>
+                      </article>
+                </article>
+              </article>
+              <article class="tile is-child notification is-primary is-12">
+                <div class="field has-addons">
+                    <div class="control">
+                    <input class="input" type="text" placeholder="Break the ice">
+                    </div>
+                    <div class="control">
+                        <button onclick="" class="button is-info">Submit</button>
+                    </div>
                 </div>
               </article>
             </div>
