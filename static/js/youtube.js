@@ -20,6 +20,25 @@ socket.onopen = function () {
 };
 
 socket.onmessage = function (e) {
+    if (e.data.includes('YouAreMaster')) {
+        document.getElementById('output').innerHTML += "You are now the master";
+        document.getElementById('masterStatus').innerHTML = `<span class="tag is-success is-light is-medium">You are the master</span>`;
+    }
+    if (e.data.includes('YouAreNotMaster')) {
+        document.getElementById('output').innerHTML += "You are now NOT the master";
+        document.getElementById('masterStatus').innerHTML = `
+        <button class="button is-warning is-light" onclick="requestMaster()">
+            Request master
+        </button>
+        `;
+        document.getElementById('masterRequest').innerHTML = ``;
+    }
+    if (e.data.includes('ClientIsRequestingMaster')) {
+        document.getElementById('output').innerHTML += "Someone is requesting master";
+        document.getElementById('masterRequest').innerHTML = `
+        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept client request to become master</button>
+        `;
+    }
     if (e.data.includes('playVideoId')) {
         obj = JSON.parse(e.data)
         
@@ -43,7 +62,8 @@ socket.onmessage = function (e) {
         }
         if (obj.playerState == YT.PlayerState.ENDED) {
             if (nextVideos.length >= 1) {
-                changeVideo(nextVideos.shift())
+                changeVideo(nextVideos.shift());
+                document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-success">${nextVideos.length} track(s) playing next</span>`;
             }
             else {
                 // Stay ended I guess
@@ -54,15 +74,11 @@ socket.onmessage = function (e) {
         obj = JSON.parse(e.data);
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
         nextVideos.push(obj.cueVideoId);
+        document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-success">${nextVideos.length} track(s) playing next</span>`;
     }
 
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
-
-function send() {
-    socket.send(input.value);
-    input.value = "";
-}
 
 function requestMaster() {
     socket.send('masterRequest')
@@ -163,5 +179,4 @@ function onSearchResponse(response) {
         `;
         
     }
-    // document.getElementById('response').innerHTML = responseString;
 }

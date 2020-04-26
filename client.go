@@ -129,15 +129,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// We want to have a master client driving what is happening
-	// On the music player side
-	// A default master is the first client connected
-	master := true
-	if len(hub.clients) >= 1 {
-		log.Printf("Client will not be master")
-		master = false
-	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), master: master}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), master: false}
 	client.hub.register <- client
 	log.Printf("Client has been registered!")
 

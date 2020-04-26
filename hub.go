@@ -41,6 +41,7 @@ func newHub() *Hub {
 }
 
 func (h *Hub) run() {
+	var clientRequestingMaster *Client
 	for {
 		select {
 		case client := <-h.register:
@@ -57,34 +58,60 @@ func (h *Hub) run() {
 			if broadcast.client.master {
 				log.Printf("Client emitting message is master!!!")
 
-				// We send back to all clients only in case it was master
-				// Here we are looping on all clients and sending
-				// back the message we received from one client
-				for client := range h.clients {
-					select {
-					case client.send <- message:
-						log.Printf("Sent same message back to the client %v", string(message))
-					default:
-						close(client.send)
-						delete(h.clients, client)
+				if strings.Contains(string(message), "masterAccepted") {
+					if ok := resetMaster(broadcast.client); ok && clientRequestingMaster != nil {
+						setClientAsMaster(clientRequestingMaster)
+					}
+				} else {
+					// We send back to all clients only in case it was master
+					// Here we are looping on all clients and sending
+					// back the message we received from one client
+					for client := range h.clients {
+						select {
+						case client.send <- message:
+							log.Printf("Sent same message back to the client %v", string(message))
+						default:
+							close(client.send)
+							delete(h.clients, client)
+						}
 					}
 				}
 			}
 
 			if strings.Contains(string(message), "masterRequest") {
+				clientRequestingMaster = broadcast.client
 				log.Printf("Client is requesting control!!!")
-				if ok := resetMaster(h.clients); ok {
-					broadcast.client.master = true
+				// Lets contact master to get his agreement
+				if masterClient := getMasterClient(h.clients); masterClient != nil {
+					masterClient.send <- []byte("ClientIsRequestingMaster")
+				} else {
+					// No master meaning that client can safely become master
+					setClientAsMaster(clientRequestingMaster)
 				}
 			}
 		}
 	}
 }
 
-// This method sets all clients connected as not being master
-func resetMaster(clients map[*Client]bool) bool {
-	for client := range clients {
-		client.master = false
-	}
+func setClientAsMaster(client *Client) bool {
+	client.master = true
+	client.send <- []byte("YouAreMaster")
 	return true
+}
+
+// This method resets the master to false
+func resetMaster(client *Client) bool {
+	client.send <- []byte("YouAreNotMaster")
+	client.master = false
+	return true
+}
+
+// This method retrieves the master client
+func getMasterClient(clients map[*Client]bool) *Client {
+	for client := range clients {
+		if client.master == true {
+			return client
+		}
+	}
+	return nil
 }
