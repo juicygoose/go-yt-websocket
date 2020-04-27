@@ -95,6 +95,9 @@ socket.onmessage = function (e) {
         if (obj.playerState == YT.PlayerState.PAUSED) {
             player.pauseVideo();
         }
+        if (obj.playerState == -1) {
+            player.playVideo();
+        }
         if (obj.playerState == YT.PlayerState.ENDED) {
             if (nextVideos.length >= 1) {
                 changeVideo(nextVideos.shift());
