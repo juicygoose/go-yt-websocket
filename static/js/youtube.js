@@ -2,10 +2,11 @@
 var youtubeVideoId = 'BPkZ7xr7qJ0';
 var input = document.getElementById("input");
 var output = document.getElementById("output");
-var hostname = window.location.hostname
-var port = window.location.port
+var hostname = window.location.hostname;
+var port = window.location.port;
 var websocket_protocol = "wss"
-var nextVideos = []
+var nextVideos = [];
+var master = false;
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -25,6 +26,7 @@ socket.onopen = function () {
 
 socket.onmessage = function (e) {
     if (e.data.includes('YouAreMaster')) {
+        master = true;
         document.getElementById('output').innerHTML += "You are now the master";
         if (document.getElementById('keepPreviousPlaylistCheckbox').checked) {
             document.getElementById('output').innerHTML += "Keeping playlist";
@@ -36,6 +38,7 @@ socket.onmessage = function (e) {
         setTagNumberOfTracks();
     }
     if (e.data.includes('YouAreNotMaster')) {
+        master = false;
         document.getElementById('output').innerHTML += "You are now NOT the master";
         document.getElementById('masterStatus').innerHTML = `
         <button class="button is-warning" onclick="requestMaster()">
@@ -57,7 +60,7 @@ socket.onmessage = function (e) {
         `;
     }
     if (e.data.includes('readonlyGetPlayerState')) {
-        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}"}`;
+        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}","playTime": "${player.getCurrentTime()}"}`;
         socket.send(playerState);
     }
     if (e.data.includes('nextVideos')) {
@@ -74,10 +77,16 @@ socket.onmessage = function (e) {
             document.getElementById('output').innerHTML += "Nothing to do as the video playing is the same than video received\n";
         }
         else {
-            changeVideo(obj.playVideoId);
+            if (e.data.includes('playTime')) {
+                document.getElementById('output').innerHTML += "Going to play at a specific time\n";
+                changeVideo(obj.playVideoId, Number(obj.playTime))
+            } else {
+                changeVideo(obj.playVideoId);
+            }
+            
         }
     }
-    else if (e.data.includes('playerState')) {
+    if (e.data.includes('playerState')) {
         // Handles changes in player state
         obj = JSON.parse(e.data);
         if (obj.playerState == YT.PlayerState.PLAYING) {
@@ -96,7 +105,7 @@ socket.onmessage = function (e) {
             }
         }
     }
-    else if (e.data.includes('cueVideoId')) {
+    if (e.data.includes('cueVideoId')) {
         obj = JSON.parse(e.data);
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
         nextVideos.push(obj.cueVideoId);
@@ -120,10 +129,11 @@ function cueNewVideoId(id) {
     socket.send(videoIdSocketMsg);
 }
 
-function changeVideo(videoToPlay) {
+function changeVideo(videoToPlay, playTime = 0) {
     youtubeVideoId = videoToPlay
     socket.send('{"videoId": "' + youtubeVideoId + '"}');
-    player.loadVideoById(youtubeVideoId);
+    document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
+    player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
 }
 

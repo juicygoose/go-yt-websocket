@@ -11,3 +11,7 @@ Websocket event design
     "requestMaster": true,
 }
 ```
+
+
+Communication from master to all clients is completely free and allowed
+Communication from clients to master is restricted to master request and readonly messages 
