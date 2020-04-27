@@ -21,7 +21,6 @@ var socket = new WebSocket(websocket_protocol + "://" + hostname + ":" + port + 
 
 socket.onopen = function () {
     document.getElementById('output').innerHTML += "<p>Status: Connected</p>";
-    socket.send('readonlyGetNextVideos');
 };
 
 socket.onmessage = function (e) {
@@ -49,7 +48,7 @@ socket.onmessage = function (e) {
         `;
         document.getElementById('masterRequest').innerHTML = ``;
         // Get playlist in case it was reset by new master
-        socket.send('readonlyGetNextVideos');
+        socket.send('readonlyGetPlayerState');
     }
     if (e.data.includes('ClientIsRequestingMaster')) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
@@ -57,11 +56,12 @@ socket.onmessage = function (e) {
         <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept client request to transfer master</button>
         `;
     }
-    if (e.data.includes('readonlyGetNextVideos')) {
-        var nextVideosMsg = `{"nextVideos": ${JSON.stringify(nextVideos)}}`;
-        socket.send(nextVideosMsg);
+    if (e.data.includes('readonlyGetPlayerState')) {
+        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}"}`;
+        socket.send(playerState);
     }
     if (e.data.includes('nextVideos')) {
+        document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
         obj = JSON.parse(e.data);
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
@@ -74,8 +74,7 @@ socket.onmessage = function (e) {
             document.getElementById('output').innerHTML += "Nothing to do as the video playing is the same than video received\n";
         }
         else {
-            youtubeVideoId = obj.playVideoId;
-            changeVideo(youtubeVideoId);
+            changeVideo(obj.playVideoId);
         }
     }
     else if (e.data.includes('playerState')) {
@@ -121,10 +120,11 @@ function cueNewVideoId(id) {
     socket.send(videoIdSocketMsg);
 }
 
-function changeVideo(youtubeVideoId) {
-    socket.send('{"videoId": "' + youtubeVideoId + '"}')
+function changeVideo(videoToPlay) {
+    youtubeVideoId = videoToPlay
+    socket.send('{"videoId": "' + youtubeVideoId + '"}');
     player.loadVideoById(youtubeVideoId);
-    player.playVideo()
+    player.playVideo();
 }
 
 
@@ -155,7 +155,10 @@ function onYouTubeIframeAPIReady() {
 // 4. The API will call this function when the video player is ready.
 function onPlayerReady(event) {
     // socket.send('readyToPlay')
-    event.target.playVideo();
+    // readonly requests are addressed to the master to know basic information like
+    // playlist info, current video
+    socket.send('readonlyGetPlayerState');
+    // event.target.playVideo();
 }
 
 // 5. The API calls this function when the player's state changes.
