@@ -55,6 +55,8 @@ func (h *Hub) run() {
 			message := broadcast.message
 			log.Printf("Received a message from the client %v", string(message))
 
+			masterClient := getMasterClient(h.clients)
+
 			if broadcast.client.master {
 				log.Printf("Client emitting message is master!!!")
 
@@ -76,10 +78,7 @@ func (h *Hub) run() {
 						}
 					}
 				}
-			}
-
-			masterClient := getMasterClient(h.clients)
-			if strings.Contains(string(message), "masterRequest") {
+			} else if strings.Contains(string(message), "masterRequest") {
 				clientRequestingMaster = broadcast.client
 				log.Printf("Client is requesting control!!!")
 				// Lets contact master to get his agreement
