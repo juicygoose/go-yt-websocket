@@ -115,6 +115,19 @@ socket.onmessage = function (e) {
         setTagNumberOfTracks();
     }
 
+    if (e.data.includes('chat')) {
+        obj = JSON.parse(e.data);
+        text = obj.chatText;
+        name = obj.clientName;
+        if (name == "") {
+            name = 'Get a name dude';
+        }
+        var currentDate = new Date();
+        var hourMinutes = `<p style="font-size:11px"><em>[${currentDate.getUTCHours()}:${currentDate.getUTCMinutes()}]</em></p>`;
+        var previousChatContent = document.getElementById('chatroom').innerHTML;
+        document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
+    }
+
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
@@ -203,6 +216,7 @@ function search() {
     });
     // Send the request to the API server, call the onSearchResponse function when the data is returned
     request.execute(onSearchResponse);
+    document.getElementById('query').value = "";
 }
 // Triggered by this line: request.execute(onSearchResponse);
 function onSearchResponse(response) {
@@ -221,5 +235,16 @@ function onSearchResponse(response) {
         </tr>
         `;
         
+    }
+}
+
+// Chatroom part
+function sendChatText() {
+    var chatText = document.getElementById('chatText').value;
+    if (chatText != "" ) {
+        var name = document.getElementById('clientName').value;
+        var payload = `{"chatText": "${chatText}", "clientName": "${name}"}`;
+        socket.send(payload);
+        document.getElementById('chatText').value = "";
     }
 }

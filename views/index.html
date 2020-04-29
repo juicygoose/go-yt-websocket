@@ -29,7 +29,7 @@
                   <article class="tile is-child notification is-primary">
                     <div class="field has-addons">
                         <div class="control">
-                        <input class="input" id="query" type="text" placeholder="Find a track">
+                        <input class="input" id="query" type="text" placeholder="Find a track 💃🏼">
                         </div>
                         <div class="control">
                             <button onclick="search()" class="button is-warning" id="search-button">Search</button>
@@ -82,9 +82,7 @@
                 <p class="subtitle">Chatroom</p>
                 <article class="tile is-parent is-vertical">
                     <article class="message is-primary">
-                        <div class="message-body">
-                          <p>New text</p>
-                          <p>Another text</p>
+                        <div class="message-body" id="chatroom" style="overflow-y: auto; height:400px;">
                         </div>
                       </article>
                 </article>
@@ -92,10 +90,13 @@
               <article class="tile is-child notification is-primary is-12">
                 <div class="field has-addons">
                     <div class="control">
-                    <input class="input" type="text" placeholder="Break the ice">
+                    <input class="input" type="text" placeholder="Break the ice" id="chatText">
                     </div>
                     <div class="control">
-                        <button onclick="" class="button is-info">Submit</button>
+                        <button onclick="sendChatText()" class="button is-info">Submit</button>
+                    </div>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Name here 👻" id="clientName">
                     </div>
                 </div>
               </article>

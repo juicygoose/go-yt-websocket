@@ -94,6 +94,16 @@ func (h *Hub) run() {
 					log.Printf("Sent readonly message to master: %v", string(message))
 					masterClient.send <- message
 				}
+			} else if strings.Contains(string(message), "chat") {
+				for client := range h.clients {
+					select {
+					case client.send <- message:
+						log.Printf("Sent same message back to the client %v", string(message))
+					default:
+						close(client.send)
+						delete(h.clients, client)
+					}
+				}
 			}
 		}
 	}
