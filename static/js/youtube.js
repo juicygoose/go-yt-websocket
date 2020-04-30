@@ -34,7 +34,7 @@ socket.onmessage = function (e) {
             document.getElementById('output').innerHTML += "Resetting playlist";
             nextVideos = [];
         }
-        document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the master</span>`;
+        document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the DJ</span>`;
         setTagNumberOfTracks();
     }
     if (e.data.includes('YouAreNotMaster')) {
@@ -42,11 +42,11 @@ socket.onmessage = function (e) {
         document.getElementById('output').innerHTML += "You are now NOT the master";
         document.getElementById('masterStatus').innerHTML = `
         <button class="button is-warning" onclick="requestMaster()">
-            Request master
+            Ask to DJ
         </button>
         <label class="checkbox">
             <input type="checkbox" id="keepPreviousPlaylistCheckbox">
-            Keep playlist from previous master
+            Keep playlist from previous DJ
         </label>
         `;
         document.getElementById('masterRequest').innerHTML = ``;
@@ -56,7 +56,7 @@ socket.onmessage = function (e) {
     if (e.data.includes('ClientIsRequestingMaster')) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
         document.getElementById('masterRequest').innerHTML = `
-        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept client request to transfer master</button>
+        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept request to give back the spot</button>
         `;
     }
     if (e.data.includes('readonlyGetPlayerState')) {
@@ -212,7 +212,7 @@ function search() {
     var request = gapi.client.youtube.search.list({
         part: 'snippet',
         q:query,
-        maxResults:6
+        maxResults:8
     });
     // Send the request to the API server, call the onSearchResponse function when the data is returned
     request.execute(onSearchResponse);

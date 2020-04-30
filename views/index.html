@@ -10,14 +10,15 @@
     <script src="https://apis.google.com/js/client.js?onload=onClientLoad" type="text/javascript"></script>
   </head>
   <body>
-  <section class="hero is-bold">
+
+  <section class="hero is-bold is-dark">
     <div class="hero-body">
         <div class="container">
             <h1 class="title">
               Hacienda Warehouse Project
             </h1>
             <h2 class="subtitle">
-              Welcome to the Hacienda, enjoy!
+              <em>Welcome to the Hacienda, enjoy!</em>
             </h2>
         </div>
     </div>
@@ -55,11 +56,11 @@
                         </article>
                         <article class="tile is-child notification is-primary" id="masterStatus">
                             <button class="button is-warning" onclick="requestMaster()">
-                                Request master
+                                Ask to DJ
                             </button>
                             <label class="checkbox">
                                 <input type="checkbox" id="keepPreviousPlaylistCheckbox">
-                                Keep playlist from previous master
+                                Keep playlist from previous DJ
                             </label>
                         </article>
                         <article class="tile is-child notification is-primary">
@@ -69,7 +70,7 @@
 
                   </article>
                   <article class="tile is-child notification is-info" id="status">
-                    <p class="subtitle">Interactions</p>
+                    <!-- <p class="subtitle">Interactions</p> -->
                     <div class="container is-centered" id="masterRequest">
                     </div>
                   </article>
@@ -79,7 +80,7 @@
             </div>
             <div class="tile is-parent is-vertical">
               <article class="tile is-child notification is-primary">
-                <p class="subtitle">Chatroom</p>
+                <p class="subtitle">Breakroom</p>
                 <article class="tile is-parent is-vertical">
                     <article class="message is-primary">
                         <div class="message-body" id="chatroom" style="overflow-y: auto; height:400px;">
@@ -104,7 +105,7 @@
         </div>
     </div>
     
-    <div class="hero-body">
+    <div class="hero-body" style="display: none;">
         <div class="tile is-ancestor">
             <div class="tile is-parent">
                 <article class="tile is-child notification is-light">
@@ -117,10 +118,10 @@
         </div>
     </div>
   </section>
-  <footer class="footer">
+  <footer class="footer has-background-primary">
     <div class="content has-text-centered">
       <p>
-        <strong>Hacienda</strong> by Alex.
+        🔥 <strong>Hacienda</strong> by Alex.
       </p>
     </div>
   </footer>
