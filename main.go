@@ -9,27 +9,44 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Room represents a room with its associated hub
+type Room struct {
+	hub  *Hub
+	name []byte
+}
+
 func main() {
 
 	flag.Parse()
-	hub := newHub()
-	go hub.run()
+	router := mux.NewRouter()
 
-	var Websocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
+	houseHub := newHub()
+	go houseHub.run()
+	rockHub := newHub()
+	go rockHub.run()
+
+	var HouseWebsocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serveWs(houseHub, w, r)
+	})
+	var RockWebsocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serveWs(rockHub, w, r)
 	})
 	var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Not Implemented"))
 	})
 
-	router := mux.NewRouter()
+	router.Handle("/", http.FileServer(http.Dir("./home/")))
 
-	// Serve static assets like javascript
-	router.Handle("/", http.FileServer(http.Dir("./views/")))
+	router.Handle("/house/", http.StripPrefix("/house/", http.FileServer(http.Dir("./room/"))))
+	router.Handle("/rock/", http.StripPrefix("/rock/", http.FileServer(http.Dir("./room/"))))
+
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix("/house/static/").Handler(http.StripPrefix("/house/static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix("/rock/static/").Handler(http.StripPrefix("/rock/static/", http.FileServer(http.Dir("./static/"))))
 
 	router.Handle("/status", NotImplemented).Methods("GET")
-	router.Handle("/echo", Websocket).Methods("GET")
+	router.Handle("/house-websocket", HouseWebsocket).Methods("GET")
+	router.Handle("/rock-websocket", RockWebsocket).Methods("GET")
 
 	http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, router))
 }

@@ -5,7 +5,8 @@ RUN go get github.com/gorilla/websocket
 RUN go get github.com/gorilla/mux
 
 ADD static static
-ADD views views
+ADD room room
+ADD home home
 ADD client.go client.go
 ADD hub.go hub.go
 ADD main.go main.go

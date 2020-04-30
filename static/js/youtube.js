@@ -4,6 +4,7 @@ var input = document.getElementById("input");
 var output = document.getElementById("output");
 var hostname = window.location.hostname;
 var port = window.location.port;
+var url = window.location.pathname.replace('/', '').replace('/', '');
 var websocket_protocol = "wss"
 var nextVideos = [];
 var master = false;
@@ -18,7 +19,8 @@ if (port.includes('80')) {
     websocket_protocol = "ws"
 }
 
-var socket = new WebSocket(websocket_protocol + "://" + hostname + ":" + port + "/echo");
+var websocketUrl = `${websocket_protocol}://${hostname}:${port}/${url}-websocket`;
+var socket = new WebSocket(websocketUrl);
 
 socket.onopen = function () {
     document.getElementById('output').innerHTML += "<p>Status: Connected</p>";
