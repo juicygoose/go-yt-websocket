@@ -229,7 +229,7 @@ function onSearchResponse(response) {
         // result.id.videoId
         document.getElementById('response').innerHTML += `
         <tr>
-            <td>${result.snippet.title}</td>
+            <td style="font-size:14px">${result.snippet.title}</td>
             <td><button onclick="sendNewVideoId('${result.id.videoId}')" class="button is-danger is-small">Play</button></td>
             <td><button onclick="cueNewVideoId('${result.id.videoId}')" class="button is-info is-small">Cue</button></td>
         </tr>
