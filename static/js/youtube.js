@@ -8,6 +8,26 @@ var websocket_protocol = "wss"
 var nextVideos = [];
 var master = false;
 
+var roomId = 'main';
+var roomName = "Main room"
+
+var allRooms = [{
+    id: roomId,
+    name: roomName
+}, {
+    id: 'rockhall',
+    name: 'The Rock Hall'
+}, {
+    id: 'garage',
+    name: 'The Punk Garage'
+}, {
+    id: 'zion',
+    name: 'Zion meadow'
+}, {
+    id: 'electro',
+    name: 'The Electro Warehouse'
+}];
+
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
 }
@@ -52,6 +72,7 @@ socket.onmessage = function (e) {
         document.getElementById('masterRequest').innerHTML = ``;
         // Get playlist in case it was reset by new master
         socket.send('readonlyGetPlayerState');
+        socket.send('readonlyGetPlayerState');
     }
     if (e.data.includes('ClientIsRequestingMaster')) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
@@ -60,17 +81,20 @@ socket.onmessage = function (e) {
         `;
     }
     if (e.data.includes('readonlyGetPlayerState')) {
-        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}","playTime": "${player.getCurrentTime()}"}`;
+        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}","playTime": "${player.getCurrentTime()}", "roomId": "${roomId}"}`;
         socket.send(playerState);
     }
     if (e.data.includes('nextVideos')) {
         document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
         obj = JSON.parse(e.data);
+        if (obj.roomId !== roomId) {return;}
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
     }
     if (e.data.includes('playVideoId')) {
         obj = JSON.parse(e.data);
+        console.log("I'm in " + roomId + " and this is for " + obj.roomId)
+        if (obj.roomId !== roomId) {return;}
         
         document.getElementById('output').innerHTML += "This is the json with video id: " + obj.playVideoId + " \n";
         if (obj.playVideoId == youtubeVideoId) {
@@ -89,6 +113,7 @@ socket.onmessage = function (e) {
     if (e.data.includes('playerState')) {
         // Handles changes in player state
         obj = JSON.parse(e.data);
+        if (obj.roomId !== roomId) {return;}
         if (obj.playerState == YT.PlayerState.PLAYING) {
             player.playVideo();
         }
@@ -110,6 +135,7 @@ socket.onmessage = function (e) {
     }
     if (e.data.includes('cueVideoId')) {
         obj = JSON.parse(e.data);
+        if (obj.roomId !== roomId) {return;}
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
         nextVideos.push(obj.cueVideoId);
         setTagNumberOfTracks();
@@ -117,8 +143,11 @@ socket.onmessage = function (e) {
 
     if (e.data.includes('chat')) {
         obj = JSON.parse(e.data);
-        text = obj.chatText;
-        name = obj.clientName;
+
+        if (obj.roomId !== roomId) {return;}
+
+        var text = obj.chatText;
+        var name = obj.clientName;
         if (name == "") {
             name = 'Get a name dude';
         }
@@ -128,26 +157,35 @@ socket.onmessage = function (e) {
         document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
     }
 
+    if (e.data.includes('rooms')) {
+        obj = JSON.parse(e.data);
+        allRooms = obj;
+        refreshRooms(obj);
+    }
+
+    refreshRooms(allRooms);
+
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
 function requestMaster() {
-    socket.send('masterRequest')
+    var requestBody = `{"masterRequest": "true", "roomId": "${roomId}"}`;
+    socket.send(requestBody)
 }
 
 function sendNewVideoId(id) {
-    var videoIdSocketMsg = `{"playVideoId": "${id}"}`;
+    var videoIdSocketMsg = `{"playVideoId": "${id}", "roomId": "${roomId}"}`;
     socket.send(videoIdSocketMsg);
 }
 
 function cueNewVideoId(id) {
-    var videoIdSocketMsg = `{"cueVideoId": "${id}"}`;
+    var videoIdSocketMsg = `{"cueVideoId": "${id}", "roomId": "${roomId}"}`;
     socket.send(videoIdSocketMsg);
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
     youtubeVideoId = videoToPlay
-    socket.send('{"videoId": "' + youtubeVideoId + '"}');
+    socket.send('{"videoId": "' + youtubeVideoId + '", "roomId": "${roomId}"}');
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
     player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
@@ -175,7 +213,7 @@ function onYouTubeIframeAPIReady() {
         'onStateChange': onPlayerStateChange
         }
     });
-    socket.send('{"videoId": "' + youtubeVideoId + '"}');
+    socket.send('{"videoId": "' + youtubeVideoId + '", "roomId": "${roomId}"}');
 }
 
 // 4. The API will call this function when the video player is ready.
@@ -238,13 +276,46 @@ function onSearchResponse(response) {
     }
 }
 
+
+function refreshRooms(results) {
+    if (!results) {
+        results = allRooms;
+    }
+    document.getElementById('rooms').innerHTML = '';
+    console.log(results);
+    for(var i = 0; i < results.length; i++) {
+        var result = results[i];
+        // result.id
+        document.getElementById('rooms').innerHTML += `
+        <tr>
+            <td style="font-size:14px">${result.name}</td>
+            <td><button onclick="changeRoom('${result.id}', '${result.name}')" class="button is-danger is-small">Join</button></td>
+        </tr>
+        `;
+    }
+}
+
+function changeRoom(id, name) {
+    roomId = id;
+    roomName = name;
+    document.getElementById("roomName").innerHTML = 'You are in the ' + roomName;
+    document.getElementById('chatroom').innerHTML = 'Switched to a new room'
+    socket.send('readonlyGetPlayerState');
+}
+
+
 // Chatroom part
 function sendChatText() {
     var chatText = document.getElementById('chatText').value;
     if (chatText != "" ) {
         var name = document.getElementById('clientName').value;
-        var payload = `{"chatText": "${chatText}", "clientName": "${name}"}`;
+        var payload = `{"chatText": "${chatText}", "clientName": "${name}", "roomId": "${roomId}"}`;
         socket.send(payload);
         document.getElementById('chatText').value = "";
     }
 }
+
+setTimeout(function init() {
+    refreshRooms(allRooms);
+    changeRoom(roomId, roomName);
+}, 1000);

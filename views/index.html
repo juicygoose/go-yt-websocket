@@ -19,6 +19,7 @@
             </h1>
             <h2 class="subtitle">
               <em>Welcome to the Hacienda, enjoy 🎉</em>
+              <em id="roomName"></em>
             </h2>
         </div>
     </div>
@@ -26,7 +27,21 @@
         <div class="tile is-ancestor">
             <div class="tile is-vertical is-9">
               <div class="tile">
-                <div class="tile is-parent has-text-centered  is-4">
+
+                  <div class="tile is-parent has-text-centered  is-3">
+                      <article class="tile is-child notification is-primary">
+                          <h2>Rooms</h2>
+                          <div class="table-container">
+                              <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth">
+                                  <tbody id="rooms">
+                                  </tbody>
+                              </table>
+                          </div>
+                      </article>
+                  </div>
+
+
+                <div class="tile is-parent has-text-centered  is-3">
                   <article class="tile is-child notification is-primary">
                     <div class="field has-addons">
                         <div class="control">
@@ -44,6 +59,7 @@
                     </div>
                   </article>
                 </div>
+
                 <div class="tile is-parent has-text-centered is-vertical">
 
                   <article class="tile is-child notification is-primary">
