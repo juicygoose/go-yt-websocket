@@ -10,7 +10,7 @@ var nextVideos = [];
 var master = false;
 
 var suggestions = [];
-var boo = 0, like = 0;
+var feedbackScore = 0;
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -141,11 +141,7 @@ socket.onmessage = function (e) {
     }
 
     if (obj.feedback) {
-        if (obj.feedback === 1) {
-            ++like;
-        } else {
-            ++boo;
-        }
+        feedbackScore += obj.feedback;
         refreshFeedback();
     }
 
@@ -185,8 +181,7 @@ function refreshSuggestions() {
 }
 
 function refreshFeedback() {
-    document.getElementById('boo-counter').innerHTML = boo;
-    document.getElementById('like-counter').innerHTML = like;
+    document.getElementById('feedback-counter').innerHTML = feedbackScore;
 }
 
 function suggestVideoId(id, title) {
@@ -217,8 +212,7 @@ function sendLike() {
 
 function changeVideo(videoToPlay, playTime = 0) {
     if (playTime == 0) {
-        boo = 0;
-        like = 0;
+        feedbackScore = 0;
         refreshFeedback();
     }
     youtubeVideoId = videoToPlay
