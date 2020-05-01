@@ -256,6 +256,7 @@ function onClientLoad() {
 // Called automatically when YouTube API interface is loaded (see line 9).
 function onYouTubeApiLoad() {
     gapi.client.setApiKey('AIzaSyCeV93ONxiwmUY7R05wh2ZmDjpHYFw0OAg');
+    includeHTML();
 }
 
 // Called when the search button is clicked in the html code
@@ -348,7 +349,3 @@ function includeHTML() {
     console.log("HTML loaded, calling onYouTubeIframeAPIReady")
     onYouTubeIframeAPIReady();
 }
-
-setTimeout(function init() {
-    includeHTML();
-}, 1);
