@@ -347,4 +347,5 @@ function includeHTML() {
 
 setTimeout(function init() {
     includeHTML();
+    onYouTubeIframeAPIReady();
 }, 1);
