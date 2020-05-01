@@ -352,4 +352,3 @@ function includeHTML() {
 setTimeout(function init() {
     includeHTML();
 }, 1);
-
