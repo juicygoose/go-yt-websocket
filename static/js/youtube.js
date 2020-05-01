@@ -10,6 +10,7 @@ var nextVideos = [];
 var master = false;
 
 var suggestions = [];
+var boo = 0, like = 0;
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -139,6 +140,15 @@ socket.onmessage = function (e) {
         document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
     }
 
+    if (obj.feedback) {
+        if (obj.feedback === 1) {
+            ++like;
+        } else {
+            ++boo;
+        }
+        refreshFeedback();
+    }
+
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
@@ -174,6 +184,11 @@ function refreshSuggestions() {
     });
 }
 
+function refreshFeedback() {
+    document.getElementById('boo-counter').innerHTML = boo;
+    document.getElementById('like-counter').innerHTML = like;
+}
+
 function suggestVideoId(id, title) {
     var videoIdSocketMsg = {
         "suggestedVideoId": id,
@@ -189,7 +204,23 @@ function cueNewVideoId(id) {
     removeSuggestion(id);
 }
 
+function sendBoo() {
+    socket.send(JSON.stringify({
+        feedback: -1
+    }));
+}
+function sendLike() {
+    socket.send(JSON.stringify({
+        feedback: 1
+    }));
+}
+
 function changeVideo(videoToPlay, playTime = 0) {
+    if (playTime == 0) {
+        boo = 0;
+        like = 0;
+        refreshFeedback();
+    }
     youtubeVideoId = videoToPlay
     socket.send('{"videoId": "' + youtubeVideoId + '"}');
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
