@@ -26,81 +26,13 @@
         <div class="tile is-ancestor">
             <div class="tile is-vertical is-9">
               <div class="tile">
-                <div class="tile is-parent has-text-centered  is-4">
-                  <article class="tile is-child notification is-primary">
-                    <div class="field has-addons">
-                        <div class="control">
-                        <input class="input" id="query" type="text" placeholder="Find a track 💃🏼">
-                        </div>
-                        <div class="control">
-                            <button onclick="search()" class="button is-warning" id="search-button">Search</button>
-                        </div>
-                    </div>
-                    <div class="table-container">
-                        <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth">
-                            <tbody  id="response">
-                            </tbody>
-                        </table>
-                    </div>
-                  </article>
+                <div class="tile is-parent has-text-centered  is-4" include-html="songs.html">
                 </div>
-                <div class="tile is-parent has-text-centered is-vertical">
-
-                  <article class="tile is-child notification is-primary">
-                    <!-- <p class="title">Tra</p>
-                    <p class="subtitle">With an image</p> -->
-                    <div id="player"></div>
-                    <div class="tile is-parent has-text-centered">
-                        <article class="tile is-child notification is-primary" id="numberOfTracksNext">
-                            <span class="tag is-light">0 track(s) playing next</span>
-                        </article>
-                        <article class="tile is-child notification is-primary" id="masterStatus">
-                            <button class="button is-warning" onclick="requestMaster()">
-                                Ask to DJ
-                            </button>
-                            <label class="checkbox">
-                                <input type="checkbox" id="keepPreviousPlaylistCheckbox">
-                                Keep playlist from previous DJ
-                            </label>
-                        </article>
-                        <article class="tile is-child notification is-primary">
-                            <span class="tag is-light">N guys connected</span>
-                        </article>   
-                    </div>
-
-                  </article>
-                  <article class="tile is-child notification is-info" id="status">
-                    <!-- <p class="subtitle">Interactions</p> -->
-                    <div class="container is-centered" id="masterRequest">
-                    </div>
-                  </article>
-
+                <div class="tile is-parent has-text-centered is-vertical" include-html="video.html">
                 </div>
               </div>
             </div>
-            <div class="tile is-parent is-vertical">
-              <article class="tile is-child notification is-primary">
-                <p class="subtitle">Breakroom</p>
-                <article class="tile is-parent is-vertical">
-                    <article class="message is-primary">
-                        <div class="message-body" id="chatroom" style="overflow-y: auto; height:400px;">
-                        </div>
-                      </article>
-                </article>
-              </article>
-              <article class="tile is-child notification is-primary is-12">
-                <div class="field has-addons">
-                    <div class="control">
-                    <input class="input" type="text" placeholder="Break the ice" id="chatText">
-                    </div>
-                    <div class="control">
-                        <button onclick="sendChatText()" class="button is-info">Submit</button>
-                    </div>
-                    <div class="control">
-                        <input class="input" type="text" placeholder="Your name 👻" id="clientName">
-                    </div>
-                </div>
-              </article>
+            <div class="tile is-parent is-vertical" include-html="./chat.html">
             </div>
         </div>
     </div>

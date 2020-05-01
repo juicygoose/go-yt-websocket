@@ -31,6 +31,7 @@ func exposeNewRoom(router *mux.Router, room *Room) {
 
 	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
 	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix(roomPath).Handler(http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
 	router.Handle(roomWebsocket, Websocket).Methods("GET")
 }
 
