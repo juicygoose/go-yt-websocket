@@ -232,6 +232,9 @@ function onSearchResponse(response) {
     for(var i = 0; i < results.length; i++) {
         var result = results[i];
         // result.id.videoId
+
+
+
         document.getElementById('response').innerHTML += `
         <tr>
             <td style="font-size:14px">${result.snippet.title}</td>
@@ -249,7 +252,7 @@ function sendChatText() {
     if (chatText != "" ) {
         var name = document.getElementById('clientName').value;
         var payload = {
-            "chatText": "chatText",
+            "chatText": chatText,
             "clientName": "name"
         };
         socket.send(JSON.stringify(payload));
