@@ -127,7 +127,7 @@ socket.onmessage = function (e) {
         setTagNumberOfTracks();
     }
 
-    if (obj.chat) {
+    if (obj.chatText) {
         text = obj.chatText;
         name = obj.clientName;
         if (name == "") {
