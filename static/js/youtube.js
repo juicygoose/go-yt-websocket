@@ -219,7 +219,6 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
 var youtubeId;
 function onYouTubeIframeAPIReady() {
-    console.log("Loading player")
     player = new YT.Player('player', {
         height: '330',
         width: '550',
@@ -299,6 +298,7 @@ function onSearchResponse(response) {
             `;
         }
     }
+
 }
 
 // Chatroom part
@@ -328,7 +328,9 @@ function includeHTML() {
             /* Make an HTTP request using the attribute value as the file name: */
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
+                console.log("onreadystatechange " + file)
                 if (this.readyState == 4) {
+                    console.log("onreadystatechange 4 " + file)
                     if (this.status == 200) {elmnt.innerHTML = this.responseText;}
                     if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
                     /* Remove the attribute, and call this function once more: */
@@ -342,9 +344,12 @@ function includeHTML() {
             return;
         }
     }
-}
 
+    console.log("HTML loaded, calling onYouTubeIframeAPIReady")
+    onYouTubeIframeAPIReady();
+}
 
 setTimeout(function init() {
     includeHTML();
 }, 1);
+
