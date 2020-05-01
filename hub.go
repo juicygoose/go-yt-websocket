@@ -103,6 +103,16 @@ func (h *Hub) run() {
 						delete(h.clients, client)
 					}
 				}
+			} else if strings.Contains(string(message), "suggestedVideoId") {
+				for client := range h.clients {
+					select {
+					case client.send <- message:
+						log.Printf("Sent same message back to the client %v", string(message))
+					default:
+						close(client.send)
+						delete(h.clients, client)
+					}
+				}
 			}
 		}
 	}

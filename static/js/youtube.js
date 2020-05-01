@@ -9,6 +9,8 @@ var websocket_protocol = "wss"
 var nextVideos = [];
 var master = false;
 
+var suggestions = [];
+
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
 }
@@ -94,6 +96,10 @@ socket.onmessage = function (e) {
             
         }
     }
+    if (obj.suggestedVideoId) {
+        suggestions.push(obj);
+        refreshSuggestions();
+    }
     if (obj.playerState) {
         // Handles changes in player state
         if (obj.playerState == YT.PlayerState.PLAYING) {
@@ -143,11 +149,44 @@ function requestMaster() {
 function sendNewVideoId(id) {
     var videoIdSocketMsg = {"playVideoId": id};
     socket.send(JSON.stringify(videoIdSocketMsg));
+
+    removeSuggestion(id);
+}
+
+function refreshSuggestions() {
+    document.getElementById('suggestions').innerHTML = '';
+    suggestions.forEach(function displaySuggestion(obj) {
+        if (master) {
+            document.getElementById('suggestions').innerHTML += `
+                <tr>
+                    <td style="font-size:14px">${obj.title}</td>
+                    <td><button onclick="sendNewVideoId('${obj.suggestedVideoId}')" class="button is-danger is-small is-rounded">Play</button></td>
+                    <td><button onclick="cueNewVideoId('${obj.suggestedVideoId}')" class="button is-info is-small is-rounded">Cue</button></td>
+                </tr>
+            `;
+        } else {
+            document.getElementById('suggestions').innerHTML += `
+                <tr>
+                    <td style="font-size:14px">${obj.title}</td>
+                </tr>
+            `;
+        }
+    });
+}
+
+function suggestVideoId(id, title) {
+    var videoIdSocketMsg = {
+        "suggestedVideoId": id,
+        "title": title
+    };
+    socket.send(JSON.stringify(videoIdSocketMsg));
 }
 
 function cueNewVideoId(id) {
     var videoIdSocketMsg = {"cueVideoId": id};
     socket.send(JSON.stringify(videoIdSocketMsg));
+
+    removeSuggestion(id);
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
@@ -156,6 +195,15 @@ function changeVideo(videoToPlay, playTime = 0) {
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
     player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
+
+    removeSuggestion(youtubeVideoId);
+}
+
+function removeSuggestion(id) {
+    suggestions = suggestions.filter(function removeSuggestionById(sugg) {
+        return sugg.suggestedVideoId !== id
+    });
+    refreshSuggestions();
 }
 
 
@@ -171,6 +219,7 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 var player;
 var youtubeId;
 function onYouTubeIframeAPIReady() {
+    console.log("Loading player")
     player = new YT.Player('player', {
         height: '330',
         width: '550',
@@ -233,16 +282,22 @@ function onSearchResponse(response) {
         var result = results[i];
         // result.id.videoId
 
-
-
-        document.getElementById('response').innerHTML += `
-        <tr>
-            <td style="font-size:14px">${result.snippet.title}</td>
-            <td><button onclick="sendNewVideoId('${result.id.videoId}')" class="button is-danger is-small is-rounded">Play</button></td>
-            <td><button onclick="cueNewVideoId('${result.id.videoId}')" class="button is-info is-small is-rounded">Cue</button></td>
-        </tr>
-        `;
-        
+        if (master) {
+            document.getElementById('response').innerHTML += `
+            <tr>
+                <td style="font-size:14px">${result.snippet.title}</td>
+                <td><button onclick="sendNewVideoId('${result.id.videoId}')" class="button is-danger is-small is-rounded">Play</button></td>
+                <td><button onclick="cueNewVideoId('${result.id.videoId}')" class="button is-info is-small is-rounded">Cue</button></td>
+            </tr>
+            `;
+        } else {
+            document.getElementById('response').innerHTML += `
+            <tr>
+                <td style="font-size:14px">${result.snippet.title}</td>
+                <td><button onclick="suggestVideoId('${result.id.videoId}', '${result.snippet.title}')" class="button is-danger is-small is-rounded">Suggest</button></td>
+            </tr>
+            `;
+        }
     }
 }
 
@@ -292,5 +347,4 @@ function includeHTML() {
 
 setTimeout(function init() {
     includeHTML();
-    onYouTubeIframeAPIReady();
-}, 1000);
+}, 1);
