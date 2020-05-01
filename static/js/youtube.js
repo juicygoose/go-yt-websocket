@@ -27,7 +27,9 @@ socket.onopen = function () {
 };
 
 socket.onmessage = function (e) {
-    if (e.data.includes('YouAreMaster')) {
+    console.dir(e.data);
+    var obj = JSON.parse(e.data);
+    if (obj.YouAreMaster) {
         master = true;
         document.getElementById('output').innerHTML += "You are now the master";
         if (document.getElementById('keepPreviousPlaylistCheckbox').checked) {
@@ -39,7 +41,7 @@ socket.onmessage = function (e) {
         document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the DJ</span>`;
         setTagNumberOfTracks();
     }
-    if (e.data.includes('YouAreNotMaster')) {
+    if (obj.YouAreNotMaster) {
         master = false;
         document.getElementById('output').innerHTML += "You are now NOT the master";
         document.getElementById('masterStatus').innerHTML = `
@@ -53,25 +55,29 @@ socket.onmessage = function (e) {
         `;
         document.getElementById('masterRequest').innerHTML = ``;
         // Get playlist in case it was reset by new master
-        socket.send('readonlyGetPlayerState');
+        socket.send(JSON.stringify({readonlyGetPlayerState: true}));
     }
-    if (e.data.includes('ClientIsRequestingMaster')) {
+    if (obj.ClientIsRequestingMaster) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
         document.getElementById('masterRequest').innerHTML = `
-        <button onclick="socket.send('masterAccepted')" class="button is-warning">Accept request to give back the spot</button>
+        <button onclick="socket.send(JSON.stringify({'masterAccepted': true}))" class="button is-warning">Accept request to give back the spot</button>
         `;
     }
-    if (e.data.includes('readonlyGetPlayerState')) {
-        var playerState = `{"nextVideos": ${JSON.stringify(nextVideos)},"playVideoId": "${youtubeVideoId}","playTime": "${player.getCurrentTime()}"}`;
-        socket.send(playerState);
+    if (obj.readonlyGetPlayerState) {
+        var playerState = {
+            "nextVideos": nextVideos,
+            "playVideoId": youtubeVideoId,
+            "playTime": player.getCurrentTime()
+        };
+        socket.send(JSON.stringify(playerState));
     }
-    if (e.data.includes('nextVideos')) {
+    if (obj.nextVideos) {
         document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
         obj = JSON.parse(e.data);
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
     }
-    if (e.data.includes('playVideoId')) {
+    if (obj.playVideoId) {
         obj = JSON.parse(e.data);
         
         document.getElementById('output').innerHTML += "This is the json with video id: " + obj.playVideoId + " \n";
@@ -88,9 +94,8 @@ socket.onmessage = function (e) {
             
         }
     }
-    if (e.data.includes('playerState')) {
+    if (obj.playerState) {
         // Handles changes in player state
-        obj = JSON.parse(e.data);
         if (obj.playerState == YT.PlayerState.PLAYING) {
             player.playVideo();
         }
@@ -110,15 +115,13 @@ socket.onmessage = function (e) {
             }
         }
     }
-    if (e.data.includes('cueVideoId')) {
-        obj = JSON.parse(e.data);
+    if (obj.cueVideoId) {
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
         nextVideos.push(obj.cueVideoId);
         setTagNumberOfTracks();
     }
 
-    if (e.data.includes('chat')) {
-        obj = JSON.parse(e.data);
+    if (obj.chat) {
         text = obj.chatText;
         name = obj.clientName;
         if (name == "") {
@@ -134,17 +137,17 @@ socket.onmessage = function (e) {
 };
 
 function requestMaster() {
-    socket.send('masterRequest')
+    socket.send(JSON.stringify({'masterRequest': true}));
 }
 
 function sendNewVideoId(id) {
-    var videoIdSocketMsg = `{"playVideoId": "${id}"}`;
-    socket.send(videoIdSocketMsg);
+    var videoIdSocketMsg = {"playVideoId": id};
+    socket.send(JSON.stringify(videoIdSocketMsg));
 }
 
 function cueNewVideoId(id) {
-    var videoIdSocketMsg = `{"cueVideoId": "${id}"}`;
-    socket.send(videoIdSocketMsg);
+    var videoIdSocketMsg = {"cueVideoId": id};
+    socket.send(JSON.stringify(videoIdSocketMsg));
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
@@ -185,7 +188,7 @@ function onPlayerReady(event) {
     // socket.send('readyToPlay')
     // readonly requests are addressed to the master to know basic information like
     // playlist info, current video
-    socket.send('readonlyGetPlayerState');
+    socket.send(JSON.stringify({'readonlyGetPlayerState': true}));
     // event.target.playVideo();
 }
 
@@ -229,6 +232,9 @@ function onSearchResponse(response) {
     for(var i = 0; i < results.length; i++) {
         var result = results[i];
         // result.id.videoId
+
+
+
         document.getElementById('response').innerHTML += `
         <tr>
             <td style="font-size:14px">${result.snippet.title}</td>
@@ -245,8 +251,46 @@ function sendChatText() {
     var chatText = document.getElementById('chatText').value;
     if (chatText != "" ) {
         var name = document.getElementById('clientName').value;
-        var payload = `{"chatText": "${chatText}", "clientName": "${name}"}`;
-        socket.send(payload);
+        var payload = {
+            "chatText": chatText,
+            "clientName": name
+        };
+        socket.send(JSON.stringify(payload));
         document.getElementById('chatText').value = "";
     }
 }
+
+// https://www.w3schools.com/howto/howto_html_include.asp
+function includeHTML() {
+    var z, i, elmnt, file, xhttp;
+    /* Loop through a collection of all HTML elements: */
+    z = document.getElementsByTagName("*");
+    for (i = 0; i < z.length; i++) {
+        elmnt = z[i];
+        /*search for elements with a certain atrribute:*/
+        file = elmnt.getAttribute("include-html");
+        if (file) {
+            /* Make an HTTP request using the attribute value as the file name: */
+            xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if (this.readyState == 4) {
+                    if (this.status == 200) {elmnt.innerHTML = this.responseText;}
+                    if (this.status == 404) {elmnt.innerHTML = "Page not found.";}
+                    /* Remove the attribute, and call this function once more: */
+                    elmnt.removeAttribute("include-html");
+                    includeHTML();
+                }
+            }
+            xhttp.open("GET", file, true);
+            xhttp.send();
+            /* Exit the function: */
+            return;
+        }
+    }
+}
+
+
+setTimeout(function init() {
+    includeHTML();
+    onYouTubeIframeAPIReady();
+}, 1000);

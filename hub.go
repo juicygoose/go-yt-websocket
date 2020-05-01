@@ -83,7 +83,7 @@ func (h *Hub) run() {
 				log.Printf("Client is requesting control!!!")
 				// Lets contact master to get his agreement
 				if masterClient != nil {
-					masterClient.send <- []byte("ClientIsRequestingMaster")
+					masterClient.send <- []byte("{\"ClientIsRequestingMaster\": true}")
 				} else {
 					// No master meaning that client can safely become master
 					setClientAsMaster(clientRequestingMaster)
@@ -110,13 +110,13 @@ func (h *Hub) run() {
 
 func setClientAsMaster(client *Client) bool {
 	client.master = true
-	client.send <- []byte("YouAreMaster")
+	client.send <- []byte("{\"YouAreMaster\": true}")
 	return true
 }
 
 // This method resets the master to false
 func resetMaster(client *Client) bool {
-	client.send <- []byte("YouAreNotMaster")
+	client.send <- []byte("{\"YouAreNotMaster\": true}")
 	client.master = false
 	return true
 }

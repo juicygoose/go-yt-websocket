@@ -1,0 +1,29 @@
+
+<article class="tile is-child notification is-primary">
+    <!-- <p class="title">Tra</p>
+    <p class="subtitle">With an image</p> -->
+    <div id="player"></div>
+    <div class="tile is-parent has-text-centered">
+        <article class="tile is-child notification is-primary" id="numberOfTracksNext">
+            <span class="tag is-light">0 track(s) playing next</span>
+        </article>
+        <article class="tile is-child notification is-primary" id="masterStatus">
+            <button class="button is-warning" onclick="requestMaster()">
+                Ask to DJ
+            </button>
+            <label class="checkbox">
+                <input type="checkbox" id="keepPreviousPlaylistCheckbox">
+                Keep playlist from previous DJ
+            </label>
+        </article>
+        <article class="tile is-child notification is-primary">
+            <span class="tag is-light">N guys connected</span>
+        </article>
+    </div>
+
+</article>
+<article class="tile is-child notification is-info" id="status">
+    <!-- <p class="subtitle">Interactions</p> -->
+    <div class="container is-centered" id="masterRequest">
+    </div>
+</article>
