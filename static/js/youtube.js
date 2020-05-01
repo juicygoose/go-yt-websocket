@@ -253,7 +253,7 @@ function sendChatText() {
         var name = document.getElementById('clientName').value;
         var payload = {
             "chatText": chatText,
-            "clientName": "name"
+            "clientName": name
         };
         socket.send(JSON.stringify(payload));
         document.getElementById('chatText').value = "";
