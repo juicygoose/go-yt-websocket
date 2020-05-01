@@ -12,41 +12,55 @@ import (
 // Room represents a room with its associated hub
 type Room struct {
 	hub  *Hub
-	name []byte
+	name string
+}
+
+func newRoom(name string) *Room {
+	return &Room{hub: newHub(), name: name}
+}
+
+func exposeNewRoom(router *mux.Router, room *Room) {
+	go room.hub.run()
+
+	var Websocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		serveWs(room.hub, w, r)
+	})
+
+	roomPath := "/" + room.name + "/"
+	roomWebsocket := "/" + room.name + "-websocket"
+
+	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
+	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir("./static/"))))
+	router.Handle(roomWebsocket, Websocket).Methods("GET")
 }
 
 func main() {
 
 	flag.Parse()
 	router := mux.NewRouter()
+	rooms := []*Room{newRoom("rock"), newRoom("rap"), newRoom("house"), newRoom("techno")}
 
-	houseHub := newHub()
-	go houseHub.run()
-	rockHub := newHub()
-	go rockHub.run()
+	for _, room := range rooms {
+		exposeNewRoom(router, room)
+	}
 
-	var HouseWebsocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		serveWs(houseHub, w, r)
-	})
-	var RockWebsocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		serveWs(rockHub, w, r)
-	})
-	var NotImplemented = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Not Implemented"))
+	var ExposeNewRoom = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if len(rooms) < 10 {
+			newRoomName := r.FormValue("name")
+			room := newRoom(newRoomName)
+			exposeNewRoom(router, room)
+			rooms = append(rooms, room)
+			w.Write([]byte("Yeahh room " + newRoomName + " was created!!"))
+		} else {
+			w.Write([]byte("Max number of rooms reached, sorry bruh..."))
+		}
 	})
 
+	router.Handle("/expose-room", ExposeNewRoom)
+
+	// Root path for landing page
 	router.Handle("/", http.FileServer(http.Dir("./home/")))
-
-	router.Handle("/house/", http.StripPrefix("/house/", http.FileServer(http.Dir("./room/"))))
-	router.Handle("/rock/", http.StripPrefix("/rock/", http.FileServer(http.Dir("./room/"))))
-
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
-	router.PathPrefix("/house/static/").Handler(http.StripPrefix("/house/static/", http.FileServer(http.Dir("./static/"))))
-	router.PathPrefix("/rock/static/").Handler(http.StripPrefix("/rock/static/", http.FileServer(http.Dir("./static/"))))
-
-	router.Handle("/status", NotImplemented).Methods("GET")
-	router.Handle("/house-websocket", HouseWebsocket).Methods("GET")
-	router.Handle("/rock-websocket", RockWebsocket).Methods("GET")
 
 	http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, router))
 }
