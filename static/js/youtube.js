@@ -42,6 +42,7 @@ socket.onmessage = function (e) {
         }
         document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the DJ</span>`;
         setTagNumberOfTracks();
+        refreshQueue();
     }
     if (obj.YouAreNotMaster) {
         master = false;
@@ -58,6 +59,7 @@ socket.onmessage = function (e) {
         document.getElementById('masterRequest').innerHTML = ``;
         // Get playlist in case it was reset by new master
         socket.send(JSON.stringify({readonlyGetPlayerState: true}));
+        refreshQueue();
     }
     if (obj.ClientIsRequestingMaster) {
         document.getElementById('output').innerHTML += "Someone is requesting master";
@@ -78,6 +80,7 @@ socket.onmessage = function (e) {
         obj = JSON.parse(e.data);
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
+        refreshQueue();
     }
     if (obj.playVideoId) {
         obj = JSON.parse(e.data);
@@ -113,8 +116,9 @@ socket.onmessage = function (e) {
         }
         if (obj.playerState == YT.PlayerState.ENDED) {
             if (nextVideos.length >= 1) {
-                changeVideo(nextVideos.shift());
+                changeVideo(nextVideos.shift().cueVideoId);
                 setTagNumberOfTracks();
+                refreshQueue();
             }
             else {
                 // Stay ended I guess
@@ -123,8 +127,9 @@ socket.onmessage = function (e) {
     }
     if (obj.cueVideoId) {
         document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
-        nextVideos.push(obj.cueVideoId);
+        nextVideos.push(obj);
         setTagNumberOfTracks();
+        refreshQueue();
     }
 
     if (obj.chatText) {
@@ -174,6 +179,28 @@ function refreshSuggestions() {
     });
 }
 
+function refreshQueue() {
+    console.dir(nextVideos);
+    document.getElementById('queue').innerHTML = '';
+    if (master) {
+        nextVideos.forEach(function displayQueuedSong(obj) {
+            document.getElementById('queue').innerHTML += `
+            <tr>
+                <td style="font-size:14px">${obj.cueVideoTitle}</td>
+                <td><button onclick="removeFromQueue('${obj.cueVideoTitle}')" class="button is-info is-small is-rounded">Remove</button></td>
+            </tr>
+            `;
+        });
+    }
+}
+
+function removeFromQueue(videoTitle) {
+    nextVideos = nextVideos.filter(function filterTitle(song) {
+        return song.cueVideoTitle !== videoTitle;
+    })
+    refreshQueue();
+}
+
 function suggestVideoId(id, title) {
     var videoIdSocketMsg = {
         "suggestedVideoId": id,
@@ -182,8 +209,8 @@ function suggestVideoId(id, title) {
     socket.send(JSON.stringify(videoIdSocketMsg));
 }
 
-function cueNewVideoId(id) {
-    var videoIdSocketMsg = {"cueVideoId": id};
+function cueNewVideoId(id, title) {
+    var videoIdSocketMsg = {"cueVideoId": id, "cueVideoTitle": title};
     socket.send(JSON.stringify(videoIdSocketMsg));
 
     removeSuggestion(id);
@@ -287,7 +314,7 @@ function onSearchResponse(response) {
             <tr>
                 <td style="font-size:14px">${result.snippet.title}</td>
                 <td><button onclick="sendNewVideoId('${result.id.videoId}')" class="button is-danger is-small is-rounded">Play</button></td>
-                <td><button onclick="cueNewVideoId('${result.id.videoId}')" class="button is-info is-small is-rounded">Cue</button></td>
+                <td><button onclick="cueNewVideoId('${result.id.videoId}', '${result.snippet.title}')" class="button is-info is-small is-rounded">Cue</button></td>
             </tr>
             `;
         } else {
