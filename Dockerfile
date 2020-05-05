@@ -10,6 +10,7 @@ ADD home home
 ADD client.go client.go
 ADD hub.go hub.go
 ADD main.go main.go
+ADD search.go search.go
 RUN go build
 
 ENTRYPOINT [ "./go" ]
