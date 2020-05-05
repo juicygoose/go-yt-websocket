@@ -6,6 +6,7 @@ var hostname = window.location.hostname;
 var port = window.location.port;
 var url = window.location.pathname.replace('/', '').replace('/', '');
 var websocket_protocol = "wss"
+var http_protocol = "https"
 var nextVideos = [];
 var master = false;
 
@@ -17,6 +18,7 @@ function setTagNumberOfTracks() {
 // Handle local dev cases
 if (port.includes('80')) {
     websocket_protocol = "ws"
+    http_protocol = "http"
 }
 
 var websocketUrl = `${websocket_protocol}://${hostname}:${port}/${url}-websocket`;
@@ -196,44 +198,38 @@ function onPlayerStateChange(event) {
     socket.send('{"playerState": ' + event.data + '}')
 }
 
-// Your use of the YouTube API must comply with the Terms of Service:
-// https://developers.google.com/youtube/terms
-// Called automatically when JavaScript client library is loaded.
-function onClientLoad() {
-    gapi.client.load('youtube', 'v3', onYouTubeApiLoad);
-}
-// Called automatically when YouTube API interface is loaded (see line 9).
-function onYouTubeApiLoad() {
-    gapi.client.setApiKey('__GOOGLE_API_KEY__');
-}
-
 // Called when the search button is clicked in the html code
 function search() {
     var query = document.getElementById('query').value;
-    // Use the JavaScript client library to create a search.list() API call.
-    var request = gapi.client.youtube.search.list({
-        part: 'snippet',
-        q:query,
-        maxResults:8
-    });
-    // Send the request to the API server, call the onSearchResponse function when the data is returned
-    request.execute(onSearchResponse);
+    var formattedSearchQuery = query.replace(new RegExp(' ', 'g'), '+');
+
+    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=8`;
+    var request = new XMLHttpRequest();
+    request.open('GET', url, true)
+    request.onload = function() {
+        var data = JSON.parse(this.response)
+        if (request.status >= 200 && request.status < 400) {
+            onSearchResponse(data)
+        } else {
+            console.log('Error searching videos')
+        }
+    }
+    request.send()
     document.getElementById('query').value = "";
 }
 // Triggered by this line: request.execute(onSearchResponse);
 function onSearchResponse(response) {
     document.getElementById('response').innerHTML = '';
     var responseString = JSON.stringify(response, '', 2);
-    results = response.items;
+    results = response.Items;
     console.log(results);
     for(var i = 0; i < results.length; i++) {
         var result = results[i];
-        // result.id.videoId
         document.getElementById('response').innerHTML += `
         <tr>
-            <td style="font-size:14px">${result.snippet.title}</td>
-            <td><button onclick="sendNewVideoId('${result.id.videoId}')" class="button is-danger is-small is-rounded">Play</button></td>
-            <td><button onclick="cueNewVideoId('${result.id.videoId}')" class="button is-info is-small is-rounded">Cue</button></td>
+            <td style="font-size:14px">${result.Title}</td>
+            <td><button onclick="sendNewVideoId('${result.ID}')" class="button is-danger is-small is-rounded">Play</button></td>
+            <td><button onclick="cueNewVideoId('${result.ID}')" class="button is-info is-small is-rounded">Cue</button></td>
         </tr>
         `;
         

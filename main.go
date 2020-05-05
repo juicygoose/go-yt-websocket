@@ -1,12 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -37,37 +36,9 @@ func exposeNewRoom(router *mux.Router, room *Room) {
 	router.Handle(roomWebsocket, Websocket).Methods("GET")
 }
 
-func createJSAndReplaceAPIKey() bool {
-	input, err := ioutil.ReadFile("static/js/youtube.js.template")
-	if err != nil {
-		log.Fatalln(err)
-		return false
-	}
-
-	content := string(input)
-	googleAPIKey := os.Getenv("GOOGLE_API_KEY")
-	if len(googleAPIKey) == 0 {
-		log.Fatalln("Google API Key not set as environment variable (GOOGLE_API_KEY).")
-		return false
-	}
-
-	output := strings.ReplaceAll(content, "__GOOGLE_API_KEY__", googleAPIKey)
-	err = ioutil.WriteFile("static/js/youtube.js", []byte(output), 0644)
-	if err != nil {
-		log.Fatalln(err)
-		return false
-	}
-	return true
-}
-
 func main() {
 
 	flag.Parse()
-
-	if !createJSAndReplaceAPIKey() {
-		log.Fatalln("Could not create JS, exiting process...")
-		return
-	}
 
 	router := mux.NewRouter()
 	rooms := []*Room{newRoom("rock"), newRoom("rap"), newRoom("house"), newRoom("techno")}
@@ -88,7 +59,19 @@ func main() {
 		}
 	})
 
+	var SearchVideo = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		searchText := r.FormValue("search_query")
+		maxResults := r.FormValue("max_results")
+		if searchText == "" || maxResults == "" {
+			log.Printf("Missing mandatory search parameters")
+		}
+		searchResults := search(searchText, maxResults)
+		byteResults, _ := json.Marshal(searchResults)
+		w.Write(byteResults)
+	})
+
 	router.Handle("/expose-room", ExposeNewRoom)
+	router.Handle("/search-video", SearchVideo)
 
 	// Root path for landing page
 	router.Handle("/", http.FileServer(http.Dir("./home/")))
