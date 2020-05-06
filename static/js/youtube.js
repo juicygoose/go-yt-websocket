@@ -179,6 +179,10 @@ function suggestVideoId(id, title) {
         "title": title
     };
     socket.send(JSON.stringify(videoIdSocketMsg));
+    var htmlId = 'reco-' + id;
+    document.getElementById(htmlId).classList.add("is-success");
+    document.getElementById(htmlId).setAttribute('disabled', 'disabled');
+    document.getElementById(htmlId).innerHTML = 'Sent to DJ';
 }
 
 function refreshSuggestions() {    
@@ -283,7 +287,7 @@ function onSearchResponse(response) {
             document.getElementById('response').innerHTML += `
             <tr>
                 <td style="font-size:14px">${result.Title}</td>
-                <td><button onclick="suggestVideoId('${result.ID}', '${result.Title}')" class="button is-info is-small is-rounded">Send reco</button></td>
+                <td><button onclick="suggestVideoId('${result.ID}', '${result.Title}')" class="button is-info is-small is-rounded" id="reco-${result.ID}">Send reco</button></td>
             </tr>
             `;
         }
