@@ -30,7 +30,6 @@ socket.onopen = function () {
 };
 
 socket.onmessage = function (e) {
-    console.dir(e.data);
     var obj = JSON.parse(e.data);
     if (obj.YouAreMaster) {
         master = true;
@@ -103,18 +102,22 @@ socket.onmessage = function (e) {
             
         }
     }
-    if (obj.playerState) {
+    if (obj.playerState || obj.playerState == 0) {
         // Handles changes in player state
-        if (obj.playerState == YT.PlayerState.PLAYING) {
+        // Playing
+        if (obj.playerState == 1) {
             player.playVideo();
         }
-        if (obj.playerState == YT.PlayerState.PAUSED) {
+        // Paused
+        if (obj.playerState == 2) {
             player.pauseVideo();
         }
+        // Unstarted
         if (obj.playerState == -1) {
             player.playVideo();
         }
-        if (obj.playerState == YT.PlayerState.ENDED) {
+        // Player ended
+        if (obj.playerState == 0) {
             if (nextVideos.length >= 1) {
                 changeVideo(nextVideos.shift());
                 setTagNumberOfTracks();
@@ -167,7 +170,7 @@ function changeVideo(videoToPlay, playTime = 0) {
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
     player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
-    removeSuggestion(id);
+    removeSuggestion(youtubeVideoId);
 }
 
 function suggestVideoId(id, title) {
