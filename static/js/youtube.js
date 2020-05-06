@@ -9,6 +9,7 @@ var websocket_protocol = "wss"
 var http_protocol = "https"
 var nextVideos = [];
 var master = false;
+var suggestions = [];
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -73,6 +74,12 @@ socket.onmessage = function (e) {
         };
         socket.send(JSON.stringify(playerState));
     }
+    if (obj.readonlySuggestedVideoId) {
+        if (document.getElementById('acceptTrackReco').checked && master) {
+            suggestions.push(obj);
+            refreshSuggestions();
+        }
+    }
     if (obj.nextVideos) {
         document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
         obj = JSON.parse(e.data);
@@ -123,7 +130,7 @@ socket.onmessage = function (e) {
         setTagNumberOfTracks();
     }
 
-    if (obj.chat) {
+    if (obj.chatText) {
         text = obj.chatText;
         name = obj.clientName;
         if (name == "") {
@@ -145,11 +152,13 @@ function requestMaster() {
 function sendNewVideoId(id) {
     var videoIdSocketMsg = {"playVideoId": id};
     socket.send(JSON.stringify(videoIdSocketMsg));
+    removeSuggestion(id);
 }
 
 function cueNewVideoId(id) {
     var videoIdSocketMsg = {"cueVideoId": id};
     socket.send(JSON.stringify(videoIdSocketMsg));
+    removeSuggestion(id);
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
@@ -158,9 +167,44 @@ function changeVideo(videoToPlay, playTime = 0) {
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
     player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
+    removeSuggestion(id);
 }
 
+function suggestVideoId(id, title) {
+    var videoIdSocketMsg = {
+        "readonlySuggestedVideoId": id,
+        "title": title
+    };
+    socket.send(JSON.stringify(videoIdSocketMsg));
+}
 
+function refreshSuggestions() {    
+    document.getElementById('suggestions').innerHTML = '';
+    suggestions.forEach(function displaySuggestion(obj) {
+        document.getElementById('suggestions').innerHTML += newVideoRow(obj.readonlySuggestedVideoId, obj.title)
+    });
+}
+
+function removeSuggestion(id) {
+    suggestions = suggestions.filter(function removeSuggestionById(sugg) {
+        return sugg.readonlySuggestedVideoId !== id
+    });
+    refreshSuggestions();
+}
+
+function clearReco() {
+    suggestions = [];
+    refreshSuggestions();
+}
+
+function newVideoRow(id, title) {
+    return `
+    <tr>
+        <td style="font-size:14px">${title}</td>
+        <td><button onclick="sendNewVideoId('${id}')" class="button is-danger is-small is-rounded">Play</button></td>
+        <td><button onclick="cueNewVideoId('${id}')" class="button is-info is-small is-rounded">Cue</button></td>
+    </tr>`;
+}
 // 2. This code loads the IFrame Player API code asynchronously.
 var tag = document.createElement('script');
 
@@ -203,10 +247,11 @@ function onPlayerStateChange(event) {
 
 // Called when the search button is clicked in the html code
 function search() {
+    document.getElementById('search-button').classList.add("is-loading");
     var query = document.getElementById('query').value;
     var formattedSearchQuery = query.replace(new RegExp(' ', 'g'), '+');
 
-    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=8`;
+    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=6`;
     var request = new XMLHttpRequest();
     request.open('GET', url, true)
     request.onload = function() {
@@ -220,21 +265,26 @@ function search() {
     request.send()
     document.getElementById('query').value = "";
 }
-// Triggered by this line: request.execute(onSearchResponse);
+
 function onSearchResponse(response) {
+    document.getElementById('search-button').classList.remove("is-loading");
     document.getElementById('response').innerHTML = '';
     var responseString = JSON.stringify(response, '', 2);
     results = response.Items;
-    console.log(results);
+    
     for(var i = 0; i < results.length; i++) {
         var result = results[i];
-        document.getElementById('response').innerHTML += `
-        <tr>
-            <td style="font-size:14px">${result.Title}</td>
-            <td><button onclick="sendNewVideoId('${result.ID}')" class="button is-danger is-small is-rounded">Play</button></td>
-            <td><button onclick="cueNewVideoId('${result.ID}')" class="button is-info is-small is-rounded">Cue</button></td>
-        </tr>
-        `;
+        if (master) {
+            document.getElementById('response').innerHTML += newVideoRow(result.ID, result.Title)
+        } else {
+            document.getElementById('response').innerHTML += `
+            <tr>
+                <td style="font-size:14px">${result.Title}</td>
+                <td><button onclick="suggestVideoId('${result.ID}', '${result.Title}')" class="button is-info is-small is-rounded">Send reco</button></td>
+            </tr>
+            `;
+        }
+
         
     }
 }
@@ -245,8 +295,8 @@ function sendChatText() {
     if (chatText != "" ) {
         var name = document.getElementById('clientName').value;
         var payload = {
-            "chatText": "chatText",
-            "clientName": "name"
+            "chatText": chatText,
+            "clientName": name
         };
         socket.send(JSON.stringify(payload));
         document.getElementById('chatText').value = "";

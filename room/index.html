@@ -25,7 +25,7 @@
         <div class="tile is-ancestor">
             <div class="tile is-vertical is-9">
               <div class="tile">
-                <div class="tile is-parent has-text-centered  is-4">
+                <div class="tile is-parent has-text-centered  is-4 is-vertical">
                   <article class="tile is-child notification is-primary">
                     <div class="field has-addons">
                         <div class="control">
@@ -41,6 +41,20 @@
                             </tbody>
                         </table>
                     </div>
+                    </article>
+                    <article class="tile is-child notification is-primary is-13">
+                        <p class="subtitle">
+                            <label class="checkbox">
+                            <input type="checkbox" id="acceptTrackReco">
+                            Accept track recommendation
+                            </label> <button onclick="clearReco()" class="button is-danger is-small is-rounded">Clear</button>
+                        </p>
+                        <div class="table-container">
+                            <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth">
+                                <tbody  id="suggestions">
+                                </tbody>
+                            </table>
+                        </div>
                   </article>
                 </div>
                 <div class="tile is-parent has-text-centered is-vertical">
