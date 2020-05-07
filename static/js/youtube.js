@@ -103,7 +103,7 @@ socket.onmessage = function (e) {
             }
             
         }
-        if (obj.upvote && obj.downvote) {
+        if (obj.upvote || obj.downvote) {
             upvote = obj.upvote;
             updateUpvote();
             downvote = obj.downvote;
@@ -265,7 +265,7 @@ function newVideoRow(id, title) {
     return `
     <tr>
         <td style="font-size:14px">${title}</td>
-        <td><button onclick="sendNewVideoId('${id}')" class="button is-danger is-small is-rounded">Play</button></td>
+        <td><button onclick="sendNewVideoId('${id}')" class="button is-success is-small is-rounded">Play</button></td>
         <td><button onclick="cueNewVideoId('${id}')" class="button is-info is-small is-rounded">Cue</button></td>
     </tr>`;
 }
