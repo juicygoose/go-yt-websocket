@@ -10,6 +10,9 @@ var http_protocol = "https"
 var nextVideos = [];
 var master = false;
 var suggestions = [];
+var sentvote = false;
+var upvote = 0;
+var downvote = 0;
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -69,7 +72,9 @@ socket.onmessage = function (e) {
         var playerState = {
             "nextVideos": nextVideos,
             "playVideoId": youtubeVideoId,
-            "playTime": player.getCurrentTime()
+            "playTime": player.getCurrentTime(),
+            "upvote": upvote,
+            "downvote": downvote
         };
         socket.send(JSON.stringify(playerState));
     }
@@ -81,13 +86,10 @@ socket.onmessage = function (e) {
     }
     if (obj.nextVideos) {
         document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
-        obj = JSON.parse(e.data);
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
     }
     if (obj.playVideoId) {
-        obj = JSON.parse(e.data);
-        
         document.getElementById('output').innerHTML += "This is the json with video id: " + obj.playVideoId + " \n";
         if (obj.playVideoId == youtubeVideoId) {
             document.getElementById('output').innerHTML += "Nothing to do as the video playing is the same than video received\n";
@@ -100,6 +102,12 @@ socket.onmessage = function (e) {
                 changeVideo(obj.playVideoId);
             }
             
+        }
+        if (obj.upvote && obj.downvote) {
+            upvote = obj.upvote;
+            updateUpvote();
+            downvote = obj.downvote;
+            updateDownvote();
         }
     }
     if (obj.playerState || obj.playerState == 0) {
@@ -145,6 +153,20 @@ socket.onmessage = function (e) {
         document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
     }
 
+    if (obj.vote) {
+        if (sentvote) {
+            sentvote = false;
+        } else {
+            if (obj.vote == 'up') {
+                upvote++;
+                updateUpvote(upvote);
+            } else {
+                downvote++;
+                updateDownvote(downvote);
+            }
+        }
+    }
+
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
@@ -170,7 +192,23 @@ function changeVideo(videoToPlay, playTime = 0) {
     document.getElementById('output').innerHTML += `Time  ${playTime}\n`;
     player.loadVideoById(youtubeVideoId, playTime);
     player.playVideo();
+
+    // Gather in one method post-change
     removeSuggestion(youtubeVideoId);
+    document.getElementById('upvote').removeAttribute('disabled');
+    document.getElementById('downvote').removeAttribute('disabled');
+    upvote = 0;
+    downvote = 0;
+    updateUpvote();
+    updateDownvote();
+}
+
+function updateUpvote() {
+    document.getElementById('upvote').innerHTML = 'Yeaah 🎉 ' + upvote;
+}
+
+function updateDownvote() {
+    document.getElementById('downvote').innerHTML = 'Bweerk ☠️ ' + downvote;
 }
 
 function suggestVideoId(id, title) {
@@ -202,6 +240,25 @@ function removeSuggestion(id) {
 function clearReco() {
     suggestions = [];
     refreshSuggestions();
+}
+
+function triggerVote(vote) {
+    var voteMsg = {
+        "social": true,
+        "vote": vote
+    };
+    sentvote = true;
+    socket.send(JSON.stringify(voteMsg));
+    if (vote == 'up') {
+        upvote++;
+        updateUpvote();
+    } else {
+        downvote++;
+        updateDownvote();
+    }
+
+    document.getElementById('upvote').setAttribute('disabled', 'disabled');
+    document.getElementById('downvote').setAttribute('disabled', 'disabled');
 }
 
 function newVideoRow(id, title) {
@@ -302,6 +359,7 @@ function sendChatText() {
     if (chatText != "" ) {
         var name = document.getElementById('clientName').value;
         var payload = {
+            "social": true,
             "chatText": chatText,
             "clientName": name
         };
