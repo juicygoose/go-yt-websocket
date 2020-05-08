@@ -46,11 +46,13 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
+			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients))
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
+			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients))
 		case broadcast := <-h.broadcast:
 			message := broadcast.message
 			log.Printf("Received a message from the client %v", string(message))
@@ -68,17 +70,13 @@ func (h *Hub) run() {
 					// We send back to all clients only in case it was master
 					// Here we are looping on all clients and sending
 					// back the message we received from one client
-					for client := range h.clients {
-						select {
-						case client.send <- message:
-							log.Printf("Sent same message back to the client %v", string(message))
-						default:
-							close(client.send)
-							delete(h.clients, client)
-						}
-					}
+					sendMessageToAllClients(h.clients, message)
 				}
 			} else if strings.Contains(string(message), "masterRequest") {
+				// A client has requested master control so we are going to ask
+				// master to get its approval
+				// Storing last client requesting master
+				// TODO Improve this behavior!
 				clientRequestingMaster = broadcast.client
 				log.Printf("Client is requesting control!!!")
 				// Lets contact master to get his agreement
@@ -86,47 +84,21 @@ func (h *Hub) run() {
 					masterClient.send <- []byte("{\"ClientIsRequestingMaster\": true}")
 				} else {
 					// No master meaning that client can safely become master
+					// Without any confirmation
 					setClientAsMaster(clientRequestingMaster)
 				}
 			} else if strings.Contains(string(message), "readonly") {
+				// Readonly keyword is used for all clients to ask information to master
+				// So we direct this message to master so that it can process it
 				if masterClient != nil {
 					log.Printf("Sent readonly message to master: %v", string(message))
 					masterClient.send <- message
 				}
 			} else if strings.Contains(string(message), "social") {
-				for client := range h.clients {
-					select {
-					case client.send <- message:
-						log.Printf("Sent same message back to the client %v", string(message))
-					default:
-						close(client.send)
-						delete(h.clients, client)
-					}
-				}
+				// Social keyword is used for info that needs to be broadcasted from clients
+				// to all other clients (like chat messages or votes)
+				sendMessageToAllClients(h.clients, message)
 			}
 		}
 	}
-}
-
-func setClientAsMaster(client *Client) bool {
-	client.master = true
-	client.send <- []byte("{\"YouAreMaster\": true}")
-	return true
-}
-
-// This method resets the master to false
-func resetMaster(client *Client) bool {
-	client.send <- []byte("{\"YouAreNotMaster\": true}")
-	client.master = false
-	return true
-}
-
-// This method retrieves the master client
-func getMasterClient(clients map[*Client]bool) *Client {
-	for client := range clients {
-		if client.master == true {
-			return client
-		}
-	}
-	return nil
 }

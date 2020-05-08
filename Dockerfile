@@ -4,13 +4,10 @@ RUN go get github.com/gorilla/handlers
 RUN go get github.com/gorilla/websocket
 RUN go get github.com/gorilla/mux
 
-ADD static static
-ADD room room
-ADD home home
-ADD client.go client.go
-ADD hub.go hub.go
-ADD main.go main.go
-ADD search.go search.go
+ADD app/* /go/
+ADD app/static /go/static
+ADD app/room /go/room
+ADD app/home /go/home
 RUN go build
 
 ENTRYPOINT [ "./go" ]

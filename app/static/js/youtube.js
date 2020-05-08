@@ -140,7 +140,6 @@ socket.onmessage = function (e) {
         nextVideos.push(obj.cueVideoId);
         setTagNumberOfTracks();
     }
-
     if (obj.chatText) {
         text = obj.chatText;
         name = obj.clientName;
@@ -152,7 +151,6 @@ socket.onmessage = function (e) {
         var previousChatContent = document.getElementById('chatroom').innerHTML;
         document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
     }
-
     if (obj.vote) {
         if (sentvote) {
             sentvote = false;
@@ -165,6 +163,9 @@ socket.onmessage = function (e) {
                 updateDownvote(downvote);
             }
         }
+    }
+    if (obj.ClientsConnected) {
+        document.getElementById('clientsConnected').innerHTML = `${obj.ClientsConnected} guy(s) connected`;
     }
 
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
@@ -208,7 +209,7 @@ function updateUpvote() {
 }
 
 function updateDownvote() {
-    document.getElementById('downvote').innerHTML = 'Bweerk ☠️ ' + downvote;
+    document.getElementById('downvote').innerHTML = downvote + ' ☠️ Bweerk';
 }
 
 function suggestVideoId(id, title) {
