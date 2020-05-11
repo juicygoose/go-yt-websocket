@@ -79,7 +79,7 @@ socket.onmessage = function (e) {
         socket.send(JSON.stringify(playerState));
     }
     if (obj.readonlySuggestedVideoId) {
-        if (document.getElementById('acceptTrackReco').checked && master) {
+        if (master) {
             suggestions.push(obj);
             refreshSuggestions();
         }
@@ -127,7 +127,8 @@ socket.onmessage = function (e) {
         // Player ended
         if (obj.playerState == 0) {
             if (nextVideos.length >= 1) {
-                changeVideo(nextVideos.shift());
+                changeVideo(nextVideos.shift().cueVideoId);
+                refreshCue();
                 setTagNumberOfTracks();
             }
             else {
@@ -136,9 +137,17 @@ socket.onmessage = function (e) {
         }
     }
     if (obj.cueVideoId) {
-        document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
-        nextVideos.push(obj.cueVideoId);
-        setTagNumberOfTracks();
+        if (obj.remove == false) {
+            document.getElementById('output').innerHTML += "Cue req with id: " + obj.cueVideoId + " \n";
+            nextVideos.push(obj);
+            console.log(nextVideos)
+            removeSuggestion(obj.cueVideoId);
+            refreshCue();
+            setTagNumberOfTracks();
+        } else {
+            removeFromCue(obj.cueVideoId);
+            setTagNumberOfTracks();
+        }
     }
     if (obj.chatText) {
         text = obj.chatText;
@@ -181,10 +190,9 @@ function sendNewVideoId(id) {
     removeSuggestion(id);
 }
 
-function cueNewVideoId(id) {
-    var videoIdSocketMsg = {"cueVideoId": id};
+function cueNewVideoId(id, title, remove = false) {
+    var videoIdSocketMsg = {"cueVideoId": id, "cueVideoTitle": title, "remove": remove};
     socket.send(JSON.stringify(videoIdSocketMsg));
-    removeSuggestion(id);
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
@@ -227,8 +235,15 @@ function suggestVideoId(id, title) {
 function refreshSuggestions() {    
     document.getElementById('suggestions').innerHTML = '';
     suggestions.forEach(function displaySuggestion(obj) {
-        document.getElementById('suggestions').innerHTML += newVideoRow(obj.readonlySuggestedVideoId, obj.title)
+        document.getElementById('suggestions').innerHTML += newVideoRow(obj.readonlySuggestedVideoId, obj.title);
     });
+}
+
+function refreshCue() {
+    document.getElementById('playlist-table').innerHTML = '';
+    nextVideos.forEach(function displayCue(obj) {
+        document.getElementById('playlist-table').innerHTML += newVideoInPlaylist(obj.cueVideoId, obj.cueVideoTitle);
+    })
 }
 
 function removeSuggestion(id) {
@@ -236,6 +251,13 @@ function removeSuggestion(id) {
         return sugg.readonlySuggestedVideoId !== id
     });
     refreshSuggestions();
+}
+
+function removeFromCue(id) {
+    nextVideos = nextVideos.filter(function removeCueById(cue) {
+        return cue.cueVideoId !== id
+    });
+    refreshCue();
 }
 
 function clearReco() {
@@ -262,12 +284,43 @@ function triggerVote(vote) {
     document.getElementById('downvote').setAttribute('disabled', 'disabled');
 }
 
+var activePanel = 'search';
+
+function activatepanel(panelToActivate) {
+    if (master) {
+        // Only master has access to recos and playlist
+        document.getElementById('track-toolbox-' + activePanel).setAttribute('style', 'display: none;')
+        document.getElementById('track-toolbox-' + panelToActivate).removeAttribute('style');
+        document.getElementById('panel-tab-' + activePanel).classList.remove("is-active");
+        document.getElementById('panel-tab-'+ panelToActivate).classList.add("is-active");
+        activePanel = panelToActivate;
+    } else {
+        toggleModal(true);
+    }
+}
+
+function toggleModal(open = false) {
+    if (open == true) {
+        document.getElementById("modal").classList.add("is-active");
+    } else {
+        document.getElementById("modal").classList.remove("is-active");
+    }
+}
+
 function newVideoRow(id, title) {
     return `
     <tr>
         <td style="font-size:14px">${title}</td>
         <td><button onclick="sendNewVideoId('${id}')" class="button is-success is-small is-rounded">Play</button></td>
-        <td><button onclick="cueNewVideoId('${id}')" class="button is-info is-small is-rounded">Cue</button></td>
+        <td><button onclick="cueNewVideoId('${id}', '${title}')" class="button is-info is-small is-rounded">Cue</button></td>
+    </tr>`;
+}
+
+function newVideoInPlaylist(id, title) {
+    return `
+    <tr>
+        <td style="font-size:14px">${title}</td>
+        <td><button onclick="cueNewVideoId('${id}', '${title}', true)" class="button is-danger is-small is-rounded">Remove</button></td>
     </tr>`;
 }
 // 2. This code loads the IFrame Player API code asynchronously.
