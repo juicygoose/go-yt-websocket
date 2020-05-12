@@ -8,6 +8,7 @@ ADD app/* /go/
 ADD app/static /go/static
 ADD app/room /go/room
 ADD app/home /go/home
+ADD app/parts /go/parts
 RUN go build
 
 ENTRYPOINT [ "./go" ]
