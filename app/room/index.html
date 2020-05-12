@@ -6,9 +6,16 @@
     <title>HWP</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
     <script src="static/js/youtube.js" type="text/javascript"></script>
+    <script> 
+        $(function(){
+          $("#navBarContent").load("parts/navbar.html"); 
+        });
+    </script> 
   </head>
   <body>
+    <div id="navBarContent"></div>
 
     <div class="modal" id="modal">
         <div class="modal-background" onclick="toggleModal()"></div>
@@ -28,16 +35,9 @@
 
   <section class="hero is-bold">
     <div class="hero-body">
-        <div class="container">
-            <h1 class="title">
-                Hacienda Warehouse Project
-            </h1>
-            <h2 class="subtitle">
-              <em>Welcome to the Hacienda, enjoy 🎉</em>
-            </h2>
+        <div class="container has-text-centered">
+            <img src="static/assets/hacienda-s.png">
         </div>
-    </div>
-    <div class="hero-body">
         <div class="tile is-ancestor">
             <div class="tile is-vertical is-9">
               <div class="tile">

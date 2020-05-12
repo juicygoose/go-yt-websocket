@@ -33,6 +33,7 @@ func exposeNewRoom(router *mux.Router, room *Room) {
 
 	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
 	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix(roomPath + "parts/").Handler(http.StripPrefix(roomPath+"parts/", http.FileServer(http.Dir("./parts/"))))
 	router.Handle(roomWebsocket, Websocket).Methods("GET")
 }
 
@@ -41,7 +42,7 @@ func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
-	rooms := []*Room{newRoom("rock"), newRoom("rap"), newRoom("house"), newRoom("techno")}
+	rooms := []*Room{newRoom("rock"), newRoom("rap"), newRoom("house")}
 
 	for _, room := range rooms {
 		exposeNewRoom(router, room)
@@ -76,6 +77,7 @@ func main() {
 	// Root path for landing page
 	router.Handle("/", http.FileServer(http.Dir("./home/")))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
+	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir("./parts/"))))
 
 	http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, router))
 }
