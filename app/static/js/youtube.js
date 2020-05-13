@@ -16,6 +16,7 @@ var downvote = 0;
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
+    document.getElementById('tracksInPlaylist').innerHTML = `${nextVideos.length}`;
 }
 
 
@@ -237,6 +238,7 @@ function refreshSuggestions() {
     suggestions.forEach(function displaySuggestion(obj) {
         document.getElementById('suggestions').innerHTML += newVideoRow(obj.readonlySuggestedVideoId, obj.title);
     });
+    document.getElementById('tracksInReco').innerHTML = `${suggestions.length}`;
 }
 
 function refreshCue() {

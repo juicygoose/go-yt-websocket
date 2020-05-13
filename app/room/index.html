@@ -44,12 +44,16 @@
                 <div class="tile is-parent has-text-centered  is-4 is-vertical">
                     <nav class="panel is-fullwidth is-primary">
                         <p class="panel-heading">
-                          Track toolbox
+                          Record shelf
                         </p>
                         <p class="panel-tabs">
                             <a class="is-active" onclick="activatepanel('search')" id="panel-tab-search">Search</a>
-                            <a onclick="activatepanel('reco')" id="panel-tab-reco">Recommendations</a>
-                            <a onclick="activatepanel('playlist')" id="panel-tab-playlist">Playlist</a>
+                            <a onclick="activatepanel('reco')" id="panel-tab-reco">
+                                Recommendations <span class="tag is-info is-light is-rounded" id="tracksInReco">0</span>
+                            </a>
+                            <a onclick="activatepanel('playlist')" id="panel-tab-playlist">
+                                Playlist <span class="tag is-info is-light is-rounded" id="tracksInPlaylist">0</span>
+                            </a>
                         </p>
                         <div class="content" id="track-toolbox-search">
                             <a class="panel-block is-active is-fullwidth">

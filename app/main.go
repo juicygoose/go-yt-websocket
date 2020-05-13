@@ -42,7 +42,7 @@ func main() {
 	flag.Parse()
 
 	router := mux.NewRouter()
-	rooms := []*Room{newRoom("rock"), newRoom("rap"), newRoom("house")}
+	rooms := []*Room{newRoom("general"), newRoom("techno"), newRoom("house")}
 
 	for _, room := range rooms {
 		exposeNewRoom(router, room)
