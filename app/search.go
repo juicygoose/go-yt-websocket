@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,6 +13,18 @@ import (
 var (
 	idRegexp    = regexp.MustCompile("watch\\?v=(?P<VideoId>.+?)\"")
 	titleRegexp = regexp.MustCompile("title=\"(?P<Title>.+?)\"")
+
+	// SearchVideo is the handler func to perform a search on video provider
+	SearchVideo = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		searchText := r.FormValue("search_query")
+		maxResults := r.FormValue("max_results")
+		if searchText == "" || maxResults == "" {
+			log.Printf("Missing mandatory search parameters")
+		}
+		searchResults := search(searchText, maxResults)
+		byteResults, _ := json.Marshal(searchResults)
+		w.Write(byteResults)
+	})
 )
 
 // SearchResult represents a video fetched from search

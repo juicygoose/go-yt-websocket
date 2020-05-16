@@ -3,39 +3,12 @@ package main
 import (
 	"encoding/json"
 	"flag"
-	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
-
-// Room represents a room with its associated hub
-type Room struct {
-	hub  *Hub
-	name string
-}
-
-func newRoom(name string) *Room {
-	return &Room{hub: newHub(), name: name}
-}
-
-func exposeNewRoom(router *mux.Router, room *Room) {
-	go room.hub.run()
-
-	var Websocket = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		serveWs(room.hub, w, r)
-	})
-
-	roomPath := "/" + room.name + "/"
-	roomWebsocket := "/" + room.name + "-websocket"
-
-	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
-	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir("./static/"))))
-	router.PathPrefix(roomPath + "parts/").Handler(http.StripPrefix(roomPath+"parts/", http.FileServer(http.Dir("./parts/"))))
-	router.Handle(roomWebsocket, Websocket).Methods("GET")
-}
 
 func main() {
 
@@ -60,19 +33,19 @@ func main() {
 		}
 	})
 
-	var SearchVideo = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		searchText := r.FormValue("search_query")
-		maxResults := r.FormValue("max_results")
-		if searchText == "" || maxResults == "" {
-			log.Printf("Missing mandatory search parameters")
+	var RoomsStats = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var roomsStats []*RoomStats
+		for _, room := range rooms {
+			roomStats := newRoomStats(room.name, len(room.hub.clients))
+			roomsStats = append(roomsStats, roomStats)
 		}
-		searchResults := search(searchText, maxResults)
-		byteResults, _ := json.Marshal(searchResults)
+		byteResults, _ := json.Marshal(roomsStats)
 		w.Write(byteResults)
 	})
 
 	router.Handle("/expose-room", ExposeNewRoom)
 	router.Handle("/search-video", SearchVideo)
+	router.Handle("/rooms-stats", RoomsStats)
 
 	// Root path for landing page
 	router.Handle("/", http.FileServer(http.Dir("./home/")))

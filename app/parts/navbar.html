@@ -7,17 +7,12 @@
       <a class="navbar-link">
         Rooms
       </a>
+
+      <script> 
+        getConnectedClients();
+      </script> 
   
-      <div class="navbar-dropdown">
-        <a class="navbar-item" onclick="javascript:window.location.href='/general/'">
-            <span class="tag is-success is-light is-rounded" >General</span>
-        </a>
-        <a class="navbar-item" onclick="javascript:window.location.href='/techno/'">
-            <span class="tag is-success is-light is-rounded" >Techno</span>
-        </a>
-        <a class="navbar-item" onclick="javascript:window.location.href='/house/'">
-            <span class="tag is-success is-light is-rounded" >House</span>
-        </a>
+      <div class="navbar-dropdown" id="rooms-dropdown">
         <hr class="navbar-divider">
         <div class="navbar-item">
           Version alpha-0.1.0
