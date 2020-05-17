@@ -1,0 +1,57 @@
+<nav class="panel is-fullwidth is-primary">
+    <p class="panel-heading">
+      Record shelf
+    </p>
+    <p class="panel-tabs">
+        <a class="is-active" onclick="activatepanel('search')" id="panel-tab-search">Search</a>
+        <a onclick="activatepanel('reco')" id="panel-tab-reco">
+            Recommendations <span class="tag is-info is-light is-rounded" id="tracksInReco">0</span>
+        </a>
+        <a onclick="activatepanel('playlist')" id="panel-tab-playlist">
+            Playlist <span class="tag is-info is-light is-rounded" id="tracksInPlaylist">0</span>
+        </a>
+    </p>
+    <div class="content" id="track-toolbox-search">
+        <a class="panel-block is-active is-fullwidth">
+            <p class="control has-icons-left">
+                <input class="input is-primary" id="query" type="text" placeholder="Find a track 💃🏼" onkeypress="search(event)">
+                <span class="icon is-left">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </span>
+            </p>
+        </a>
+        <a class="panel-block">
+            <div class="table-container">
+                <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
+                    <tbody  id="response">
+                    </tbody>
+                </table>
+            </div>
+        </a>
+    </div>
+    <div class="content" id="track-toolbox-reco" style="display: none;">
+        <div class="panel-block">
+            <button class="button is-danger is-outlined is-fullwidth" onclick="clearReco()">
+                Clear
+            </button>
+        </div>
+        <a class="panel-block">
+            <div class="table-container">
+                <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
+                    <tbody  id="suggestions">
+                    </tbody>
+                </table>
+            </div>
+        </a>
+    </div>
+    <div class="content" id="track-toolbox-playlist" style="display: none;">
+        <a class="panel-block">
+            <div class="table-container">
+                <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
+                    <tbody  id="playlist-table">
+                    </tbody>
+                </table>
+            </div>
+        </a>
+    </div>
+  </nav>

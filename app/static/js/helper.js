@@ -32,3 +32,41 @@ function formatNavbarItem(name, clientsConnected) {
                 <span class="tag is-success is-light is-rounded" >${name}</span> <span class="tag is-info is-light is-rounded" >${clientsConnected} attending</span>
             </a>`;
 }
+
+var activeRecordShelfPanel = 'search';
+
+function activatepanel(panelToActivate) {
+    if (panelToActivate == activeRecordShelfPanel) {
+        return
+    }
+    if (master) {
+        // Only master has access to recos and playlist
+        document.getElementById('track-toolbox-' + activeRecordShelfPanel).setAttribute('style', 'display: none;')
+        document.getElementById('track-toolbox-' + panelToActivate).removeAttribute('style');
+        document.getElementById('panel-tab-' + activeRecordShelfPanel).classList.remove("is-active");
+        document.getElementById('panel-tab-'+ panelToActivate).classList.add("is-active");
+        activeRecordShelfPanel = panelToActivate;
+    } else {
+        toggleModal(true);
+    }
+}
+
+function toggleModal(open = false) {
+    if (open == true) {
+        document.getElementById("modal").classList.add("is-active");
+    } else {
+        document.getElementById("modal").classList.remove("is-active");
+    }
+}
+
+var activeSocialPanel = 'chat';
+
+function activateSocialPanel(panelToActivate) {
+    if (panelToActivate == activeSocialPanel) {
+        return
+    }
+    document.getElementById('social-panel-' + activeSocialPanel).setAttribute('style', 'display: none;')
+    document.getElementById('social-panel-' + panelToActivate).removeAttribute('style');
+    document.getElementById('panel-tab-' + activeSocialPanel).classList.remove("is-active");
+    document.getElementById('panel-tab-'+ panelToActivate).classList.add("is-active");
+}

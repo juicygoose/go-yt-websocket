@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>HWP</title>
+    <link rel="stylesheet" href="static/css/chat.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.2/css/bulma.min.css">
     <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
@@ -12,6 +13,12 @@
     <script> 
         $(function(){
           $("#navBarContent").load("parts/navbar.html"); 
+        });
+        $(function(){
+            $("#recordShelfPanel").load("parts/record-shelf-panel.html"); 
+        });
+        $(function(){
+            $("#socialPanel").load("parts/social-panel.html"); 
         });
     </script> 
   </head>
@@ -42,70 +49,7 @@
             <div class="tile is-vertical is-9">
               <div class="tile">
                 <div class="tile is-parent has-text-centered  is-4 is-vertical">
-                    <nav class="panel is-fullwidth is-primary">
-                        <p class="panel-heading">
-                          Record shelf
-                        </p>
-                        <p class="panel-tabs">
-                            <a class="is-active" onclick="activatepanel('search')" id="panel-tab-search">Search</a>
-                            <a onclick="activatepanel('reco')" id="panel-tab-reco">
-                                Recommendations <span class="tag is-info is-light is-rounded" id="tracksInReco">0</span>
-                            </a>
-                            <a onclick="activatepanel('playlist')" id="panel-tab-playlist">
-                                Playlist <span class="tag is-info is-light is-rounded" id="tracksInPlaylist">0</span>
-                            </a>
-                        </p>
-                        <div class="content" id="track-toolbox-search">
-                            <a class="panel-block is-active is-fullwidth">
-                                <div class="field has-addons">
-                                    <div class="control has-icons-left">
-                                    <input class="input" id="query" type="text" placeholder="Find a track 💃🏼">
-                                    <span class="icon is-left">
-                                        <i class="fas fa-search" aria-hidden="true"></i>
-                                      </span>
-                                    </div>
-                                    <div class="control">
-                                        <button onclick="search()" class="button is-warning" id="search-button">Search</button>
-                                    </div>
-                                </div>
-    
-                            </a>
-                            <a class="panel-block">
-                                <div class="table-container">
-                                    <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
-                                        <tbody  id="response">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="content" id="track-toolbox-reco" style="display: none;">
-                            <div class="panel-block">
-                                <button class="button is-danger is-outlined is-fullwidth" onclick="clearReco()">
-                                    Clear
-                                </button>
-                            </div>
-                            <a class="panel-block">
-                                <div class="table-container">
-                                    <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
-                                        <tbody  id="suggestions">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="content" id="track-toolbox-playlist" style="display: none;">
-                            <a class="panel-block">
-                                <div class="table-container">
-                                    <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">
-                                        <tbody  id="playlist-table">
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </a>
-                        </div>
-                      </nav>
-                  
+                    <div id="recordShelfPanel"></div>
                 </div>
                 <div class="tile is-parent has-text-centered is-vertical">
                   <article class="tile is-child notification is-primary">
@@ -150,51 +94,7 @@
               </div>
             </div>
             <div class="tile is-parent is-vertical">
-              <article class="tile is-child notification is-primary">
-                <p class="subtitle">Breakroom</p>
-                <article class="tile is-parent is-vertical">
-                    <article class="message is-primary">
-                        <div class="message-body" id="chatroom" style="overflow-y: auto; height:450px;">
-                        </div>
-                      </article>
-                </article>
-              </article>
-              <article class="tile is-child notification is-primary is-12">
-                <div class="field has-addons">
-                    <div class="control">
-                    <input class="input" type="text" placeholder="Break the ice" id="chatText">
-                    </div>
-                    <div class="control">
-                        <button onclick="sendChatText()" class="button is-info">Submit</button>
-                    </div>
-                    <div class="control">
-                        <input class="input" type="text" placeholder="Your name 👻" id="clientName">
-                    </div>
-                </div>
-              </article>
-              <!-- <nav class="panel is-fullwidth is-primary" >
-                <p class="panel-heading has-text-centered">
-                  Breakroom
-                </p>
-                <a class="panel-block is-active is-fullwidth">
-                    <div class="field has-addons">
-                        <div class="control">
-                        <input class="input" type="text" placeholder="Break the ice" id="chatText">
-                        </div>
-                        <div class="control">
-                            <button onclick="sendChatText()" class="button is-info">Submit</button>
-                        </div>
-                        <div class="control">
-                            <input class="input" type="text" placeholder="Your name 👻" id="clientName">
-                        </div>
-                    </div>
-                </a>
-                <a class="panel-block">
-                    <nav class="panel is-fullwidth is-primary" id="chatroom">
-                    </nav>
-                </a>
-              </nav>
-           -->
+                <div id="socialPanel"></div>
             </div>
         </div>
     </div>

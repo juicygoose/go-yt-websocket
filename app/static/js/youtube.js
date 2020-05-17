@@ -13,6 +13,7 @@ var suggestions = [];
 var sentvote = false;
 var upvote = 0;
 var downvote = 0;
+const uid = Math.floor(100000 + Math.random() * 900000);
 
 function setTagNumberOfTracks() {
     document.getElementById('numberOfTracksNext').innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
@@ -153,13 +154,17 @@ socket.onmessage = function (e) {
     if (obj.chatText) {
         text = obj.chatText;
         name = obj.clientName;
+        var newMessage;
         if (name == "") {
             name = 'Get a name dude';
         }
-        var currentDate = new Date();
-        var hourMinutes = `<p style="font-size:11px"><em>[${currentDate.getUTCHours()}:${currentDate.getUTCMinutes()}]</em></p>`;
-        var previousChatContent = document.getElementById('chatroom').innerHTML;
-        document.getElementById('chatroom').innerHTML = `${hourMinutes}<p style="font-size:13px"><em><strong>${name}</strong></em> - ${obj.chatText}</p>` + previousChatContent;
+        if (obj.uid == uid) {
+            newMessage = `<li class="me">${obj.chatText}</li>`;
+        } else {
+            newMessage = `<li class="him"><em><strong>${name}</strong></em> <br/> ${obj.chatText}</li>`;
+        }
+        document.getElementById('chatroom').innerHTML += newMessage;
+        document.getElementById('chatroom').scrollTo(0, document.getElementById('chatroom').scrollHeight);
     }
     if (obj.vote) {
         if (sentvote) {
@@ -286,29 +291,6 @@ function triggerVote(vote) {
     document.getElementById('downvote').setAttribute('disabled', 'disabled');
 }
 
-var activePanel = 'search';
-
-function activatepanel(panelToActivate) {
-    if (master) {
-        // Only master has access to recos and playlist
-        document.getElementById('track-toolbox-' + activePanel).setAttribute('style', 'display: none;')
-        document.getElementById('track-toolbox-' + panelToActivate).removeAttribute('style');
-        document.getElementById('panel-tab-' + activePanel).classList.remove("is-active");
-        document.getElementById('panel-tab-'+ panelToActivate).classList.add("is-active");
-        activePanel = panelToActivate;
-    } else {
-        toggleModal(true);
-    }
-}
-
-function toggleModal(open = false) {
-    if (open == true) {
-        document.getElementById("modal").classList.add("is-active");
-    } else {
-        document.getElementById("modal").classList.remove("is-active");
-    }
-}
-
 function newVideoRow(id, title) {
     return `
     <tr>
@@ -366,28 +348,28 @@ function onPlayerStateChange(event) {
 }
 
 // Called when the search button is clicked in the html code
-function search() {
-    document.getElementById('search-button').classList.add("is-loading");
-    var query = document.getElementById('query').value;
-    var formattedSearchQuery = query.replace(new RegExp(' ', 'g'), '+');
-
-    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=6`;
-    var request = new XMLHttpRequest();
-    request.open('GET', url, true)
-    request.onload = function() {
-        var data = JSON.parse(this.response)
-        if (request.status >= 200 && request.status < 400) {
-            onSearchResponse(data)
-        } else {
-            console.log('Error searching videos')
+function search(event) {
+    if (event.which == 13 || event.keyCode == 13) {
+        var query = document.getElementById('query').value;
+        var formattedSearchQuery = query.replace(new RegExp(' ', 'g'), '+');
+    
+        var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=6`;
+        var request = new XMLHttpRequest();
+        request.open('GET', url, true)
+        request.onload = function() {
+            var data = JSON.parse(this.response)
+            if (request.status >= 200 && request.status < 400) {
+                onSearchResponse(data)
+            } else {
+                console.log('Error searching videos')
+            }
         }
+        request.send()
+        document.getElementById('query').value = "";
     }
-    request.send()
-    document.getElementById('query').value = "";
 }
 
 function onSearchResponse(response) {
-    document.getElementById('search-button').classList.remove("is-loading");
     document.getElementById('response').innerHTML = '';
     var responseString = JSON.stringify(response, '', 2);
     results = response.Items;
@@ -410,16 +392,19 @@ function onSearchResponse(response) {
 }
 
 // Chatroom part
-function sendChatText() {
-    var chatText = document.getElementById('chatText').value;
-    if (chatText != "" ) {
-        var name = document.getElementById('clientName').value;
-        var payload = {
-            "social": true,
-            "chatText": chatText,
-            "clientName": name
-        };
-        socket.send(JSON.stringify(payload));
-        document.getElementById('chatText').value = "";
+function sendChatText(event) {
+    if (event.which == 13 || event.keyCode == 13) {
+        var chatText = document.getElementById('chatText').value;
+        if (chatText != "" ) {
+            var name = document.getElementById('clientName').value;
+            var payload = {
+                "social": true,
+                "chatText": chatText,
+                "clientName": name,
+                "uid": uid
+            };
+            socket.send(JSON.stringify(payload));
+            document.getElementById('chatText').value = "";
+        }
     }
 }

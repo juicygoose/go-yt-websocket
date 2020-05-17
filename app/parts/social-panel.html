@@ -1,0 +1,33 @@
+<article class="panel is-primary">
+    <p class="panel-heading has-text-centered">
+      Social
+    </p>
+    <div class="panel-block">
+        <p class="control has-icons-left">
+          <input class="input is-primary" type="text" placeholder="Your name  👻" id="clientName">
+          <span class="icon is-left">
+            <i class="fas fa-user-alt" aria-hidden="true"></i>
+          </span>
+        </p>
+    </div>
+    <p class="panel-tabs">
+      <a class="is-active" onclick="activateSocialPanel('chat')" id="panel-tab-chat">Chat</a>
+      <!-- <a>Public</a>
+      <a>Private</a> -->
+    </p>
+    <div class="content is-fullwidth" id="social-panel-chat">
+        <a class="panel-block is-fullwidth" >
+            <ul style="overflow-y: auto; height:350px;" id="chatroom">
+                <li class="bot">Hey! Welcome to the Hacienda, enter a name and start enjoying music with the lovely people in the room 🎉</li>
+            </ul>
+        </a>
+        <a class="panel-block">
+            <p class="control has-icons-left">
+                <input class="input is-primary" type="text" placeholder="Break the ice" id="chatText" onkeypress="sendChatText(event)">
+                <span class="icon is-left">
+                    <i class="far fa-comments" aria-hidden="true"></i>
+                </span>
+            </p>
+        </a>
+    </div>
+</article>
