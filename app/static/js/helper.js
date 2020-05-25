@@ -39,7 +39,7 @@ function activatepanel(panelToActivate) {
     if (panelToActivate == activeRecordShelfPanel) {
         return
     }
-    if (master) {
+    if (master || panelToActivate == 'search') {
         // Only master has access to recos and playlist
         document.getElementById('track-toolbox-' + activeRecordShelfPanel).setAttribute('style', 'display: none;')
         document.getElementById('track-toolbox-' + panelToActivate).removeAttribute('style');
@@ -69,4 +69,27 @@ function activateSocialPanel(panelToActivate) {
     document.getElementById('social-panel-' + panelToActivate).removeAttribute('style');
     document.getElementById('panel-tab-' + activeSocialPanel).classList.remove("is-active");
     document.getElementById('panel-tab-'+ panelToActivate).classList.add("is-active");
+    activeSocialPanel = panelToActivate;
+}
+
+function enterKeyboard(event) {
+    if (event.which == 13 || event.keyCode == 13) {
+        enterRoom();
+    }
+}
+
+function enterRoom() {
+    var guestName = document.getElementById('guestName').value;
+    if (guestName != "") {
+        document.getElementById('clientName').value = guestName;
+        document.getElementById('clientName').setAttribute('readonly', true);
+        document.getElementById("nameInput").classList.remove("is-active");
+        var newGuest = {
+            "social": true,
+            "newGuestInfo": true,
+            "uid": uid,
+            "name": guestName
+        }
+        socket.send(JSON.stringify(newGuest))
+    }
 }

@@ -5,6 +5,13 @@ import (
 	"strconv"
 )
 
+// GuestInfo container for guest info
+// coming from the client
+type GuestInfo struct {
+	UID  int    `json:"uid"`
+	Name string `json:"name"`
+}
+
 // Client passed in input becomes master
 func setClientAsMaster(client *Client) bool {
 	client.master = true
@@ -44,6 +51,12 @@ func sendMessageToAllClients(clients map[*Client]bool, message []byte) {
 	}
 }
 
-func getClientsConnectedMessage(clients map[*Client]bool) []byte {
-	return []byte("{\"ClientsConnected\": " + string(strconv.Itoa(len(clients))) + "}")
+func getClientsConnectedMessage(clients map[*Client]bool, client *Client, leaving bool) []byte {
+	var message string
+	if !leaving {
+		message = "{\"ClientsConnected\": " + string(strconv.Itoa(len(clients))) + "}"
+	} else {
+		message = "{\"ClientsConnected\": " + string(strconv.Itoa(len(clients))) + ", \"leavingClientUid\": " + string(strconv.Itoa(client.uid)) + "}"
+	}
+	return []byte(message)
 }

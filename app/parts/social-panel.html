@@ -12,13 +12,12 @@
     </div>
     <p class="panel-tabs">
       <a class="is-active" onclick="activateSocialPanel('chat')" id="panel-tab-chat">Chat</a>
-      <!-- <a>Public</a>
-      <a>Private</a> -->
+      <a onclick="activateSocialPanel('attendees')" id="panel-tab-attendees">Guests</a>
     </p>
     <div class="content is-fullwidth" id="social-panel-chat">
         <a class="panel-block is-fullwidth" >
             <ul style="overflow-y: auto; height:350px;" id="chatroom">
-                <li class="bot">Hey! Welcome to the Hacienda, enter a name and start enjoying music with the lovely people in the room 🎉</li>
+                <li class="bot">Hey! Welcome to the Hacienda, enjoy the music with all the lovely people in the room 🎉</li>
             </ul>
         </a>
         <a class="panel-block">
@@ -29,5 +28,7 @@
                 </span>
             </p>
         </a>
+    </div>
+    <div class="content is-fullwidth" id="social-panel-attendees" style="display: none;">
     </div>
 </article>

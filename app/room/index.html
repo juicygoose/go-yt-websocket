@@ -12,33 +12,16 @@
     <script src="static/js/youtube.js" type="text/javascript"></script>
     <script> 
         $(function(){
-          $("#navBarContent").load("parts/navbar.html"); 
-        });
-        $(function(){
-            $("#recordShelfPanel").load("parts/record-shelf-panel.html"); 
-        });
-        $(function(){
-            $("#socialPanel").load("parts/social-panel.html"); 
+            $("#navBarContent").load("parts/navbar.html");
+            $("#recordShelfPanel").load("parts/record-shelf-panel.html");
+            $("#socialPanel").load("parts/social-panel.html");
+            $("#modals").load("parts/modals.html"); 
         });
     </script> 
   </head>
   <body>
     <div id="navBarContent"></div>
-
-    <div class="modal" id="modal">
-        <div class="modal-background" onclick="toggleModal()"></div>
-        <div class="modal-content">
-            <article class="message is-primary">
-                <div class="message-header">
-                  <p>Access restricted to the DJ!</p>
-                </div>
-                <div class="message-body">
-                  Request to be DJ to start adding tracks to the playlist and get recommendations from the crowd.
-                </div>
-              </article>
-        </div>
-        <button class="modal-close is-large" aria-label="close" onclick="toggleModal()"></button>
-    </div>
+    <div id="modals"></div>
 
   <section class="hero is-bold">
     <div class="hero-body">
@@ -79,17 +62,7 @@
                             </article>
                         </div>
                     </div>
-                    <div class="container">
-
-                    </div>
-
-
                   </article>
-                  <article class="tile is-child notification is-info" id="status">
-                    <div class="container is-centered" id="masterRequest">
-                    </div>
-                  </article>
-
                 </div>
               </div>
             </div>

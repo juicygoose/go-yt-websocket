@@ -1,0 +1,29 @@
+<div class="modal" id="modal">
+    <div class="modal-background" onclick="toggleModal()"></div>
+    <div class="modal-content">
+        <article class="message is-primary">
+            <div class="message-header">
+              <p>Access restricted to the DJ!</p>
+            </div>
+            <div class="message-body">
+              Request to be DJ to start adding tracks to the playlist and get recommendations from the crowd.
+            </div>
+          </article>
+    </div>
+    <button class="modal-close is-large" aria-label="close" onclick="toggleModal()"></button>
+</div>
+
+<div class="modal is-active" id="nameInput">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+      <header class="modal-card-head">
+        <p class="modal-card-title">Hey! Let's add your name to the guest list 💃🏼</p>
+      </header>
+      <section class="modal-card-body">
+        <input class="input is-success" type="text" placeholder="Your name  👻" id="guestName" onkeypress="enterKeyboard(event)">
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" onclick="enterRoom()">Enter room</button>
+      </footer>
+    </div>
+  </div>

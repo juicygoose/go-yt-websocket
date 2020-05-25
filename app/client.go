@@ -45,6 +45,12 @@ type Client struct {
 
 	// Client master or not
 	master bool
+
+	// Unique identifier for the client
+	uid int
+
+	// Name of the client
+	name []byte
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -129,7 +135,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), master: false}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), master: false, uid: 0, name: []byte("")}
 	client.hub.register <- client
 	log.Printf("Client has been registered!")
 

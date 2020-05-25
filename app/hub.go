@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"strings"
 )
@@ -46,18 +47,29 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients))
+			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients, client, false))
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
 				close(client.send)
 			}
-			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients))
+			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients, client, true))
 		case broadcast := <-h.broadcast:
 			message := broadcast.message
 			log.Printf("Received a message from the client %v", string(message))
 
 			masterClient := getMasterClient(h.clients)
+
+			if strings.Contains(string(message), "newGuestInfo") {
+				// Here we are going to add information about the client
+				var guestInfo GuestInfo
+				err := json.Unmarshal(message, &guestInfo)
+				if err != nil {
+					log.Printf("Something wrong happened while decoding guest info")
+				}
+				broadcast.client.name = []byte(guestInfo.Name)
+				broadcast.client.uid = guestInfo.UID
+			}
 
 			if broadcast.client.master {
 				log.Printf("Client emitting message is master!!!")

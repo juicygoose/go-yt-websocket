@@ -13,6 +13,7 @@ var suggestions = [];
 var sentvote = false;
 var upvote = 0;
 var downvote = 0;
+var guestList = [];
 const uid = Math.floor(100000 + Math.random() * 900000);
 
 function setTagNumberOfTracks() {
@@ -38,7 +39,6 @@ socket.onmessage = function (e) {
     var obj = JSON.parse(e.data);
     if (obj.YouAreMaster) {
         master = true;
-        document.getElementById('output').innerHTML += "You are now the master";
         if (document.getElementById('keepPreviousPlaylistCheckbox').checked) {
             document.getElementById('output').innerHTML += "Keeping playlist";
         } else {
@@ -47,10 +47,15 @@ socket.onmessage = function (e) {
         }
         document.getElementById('masterStatus').innerHTML = `<span class="tag is-info is-medium">You are the DJ</span>`;
         setTagNumberOfTracks();
+        refreshCue();
+        var masterId = {
+            "masterId": uid
+            }
+        addChatText("bot", "You are now in charge 👑")
+        socket.send(JSON.stringify(masterId));
     }
     if (obj.YouAreNotMaster) {
         master = false;
-        document.getElementById('output').innerHTML += "You are now NOT the master";
         document.getElementById('masterStatus').innerHTML = `
         <button class="button is-warning" onclick="requestMaster()">
             Ask to DJ
@@ -60,15 +65,14 @@ socket.onmessage = function (e) {
             Keep playlist from previous DJ
         </label>
         `;
-        document.getElementById('masterRequest').innerHTML = ``;
         // Get playlist in case it was reset by new master
         socket.send(JSON.stringify({readonlyGetPlayerState: true}));
     }
     if (obj.ClientIsRequestingMaster) {
-        document.getElementById('output').innerHTML += "Someone is requesting master";
-        document.getElementById('masterRequest').innerHTML = `
-        <button onclick="socket.send(JSON.stringify({'masterAccepted': true}))" class="button is-warning">Accept request to give back the spot</button>
-        `;
+        addChatText("bot", `Someone is requesting to DJ!
+        <button class="button is-warning is-outlined is-fullwidth is-small" onclick="socket.send(JSON.stringify({'masterAccepted': true}))">
+            Accept
+        </button>`);
     }
     if (obj.readonlyGetPlayerState) {
         var playerState = {
@@ -76,7 +80,9 @@ socket.onmessage = function (e) {
             "playVideoId": youtubeVideoId,
             "playTime": player.getCurrentTime(),
             "upvote": upvote,
-            "downvote": downvote
+            "downvote": downvote,
+            "guestList": guestList,
+            "masterId": uid
         };
         socket.send(JSON.stringify(playerState));
     }
@@ -90,6 +96,7 @@ socket.onmessage = function (e) {
         document.getElementById('output').innerHTML += "here is next videos data" + e.data + "\n";
         nextVideos = obj.nextVideos;
         setTagNumberOfTracks();
+        refreshCue();
     }
     if (obj.playVideoId) {
         document.getElementById('output').innerHTML += "This is the json with video id: " + obj.playVideoId + " \n";
@@ -159,12 +166,10 @@ socket.onmessage = function (e) {
             name = 'Get a name dude';
         }
         if (obj.uid == uid) {
-            newMessage = `<li class="me">${obj.chatText}</li>`;
+            addChatText("", obj.chatText);
         } else {
-            newMessage = `<li class="him"><em><strong>${name}</strong></em> <br/> ${obj.chatText}</li>`;
+            addChatText(name, obj.chatText)
         }
-        document.getElementById('chatroom').innerHTML += newMessage;
-        document.getElementById('chatroom').scrollTo(0, document.getElementById('chatroom').scrollHeight);
     }
     if (obj.vote) {
         if (sentvote) {
@@ -181,13 +186,78 @@ socket.onmessage = function (e) {
     }
     if (obj.ClientsConnected) {
         document.getElementById('clientsConnected').innerHTML = `${obj.ClientsConnected} guy(s) connected`;
+        if (obj.leavingClientUid && obj.leavingClientUid > 0) {
+            guestList = guestList.filter(function removeGuestById(guest) {
+                return guest.uid !== obj.leavingClientUid
+            });
+        }
+        refreshGuestList();
+    }
+    if (obj.newGuestInfo) {
+        guestList.push({"name": obj.name, "uid": obj.uid});
+        refreshGuestList();
+    }
+    if (obj.guestList) {
+        guestList = obj.guestList;
+    }
+    if (obj.masterId && obj.masterId > 0) {
+        guestList.forEach(function setMaster(guest) {
+            if (obj.masterId > 0 && obj.masterId == guest.uid) {
+                guest.isMaster = true;
+            } else {
+                guest.isMaster = false;
+            }
+        });
+        refreshGuestList();
     }
 
     document.getElementById('output').innerHTML += "<p>Server: " + e.data + "</p>";
 };
 
+function addChatText(name, message) {
+    var newMessage;
+    if (name == "bot") {
+        newMessage = `<li class="bot">${message}</li>`;
+    }
+    else if (name != "") {
+        newMessage = `<li class="him"><em><strong>${name}</strong></em> <br/> ${message}</li>`;
+    } else {
+        newMessage = `<li class="me">${message}</li>`;
+    }
+    document.getElementById('chatroom').innerHTML += newMessage;
+    document.getElementById('chatroom').scrollTo(0, document.getElementById('chatroom').scrollHeight);
+}
+
+function refreshGuestList() {
+    if (document.getElementById('social-panel-attendees')) {
+        document.getElementById('social-panel-attendees').innerHTML = '';
+        guestList.forEach(function displayGuest(obj) {
+            if (obj.isMaster) {
+                document.getElementById('social-panel-attendees').innerHTML += `
+                <a class="panel-block is-active">
+                    <span class="panel-icon">
+                        <i class="fas fa-music" aria-hidden="true"></i>
+                    </span>
+                    ${obj.name}
+                </a>
+                `;
+            } else {
+                document.getElementById('social-panel-attendees').innerHTML += `
+                <a class="panel-block">
+                    <span class="panel-icon">
+                        <i class="far fa-user" aria-hidden="true"></i>
+                    </span>
+                    ${obj.name}
+                </a>
+                `;
+            }
+        });
+    }
+}
+
 function requestMaster() {
     socket.send(JSON.stringify({'masterRequest': true}));
+    addChatText("bot", "Request sent to the DJ 👌🏼")
 }
 
 function sendNewVideoId(id) {
