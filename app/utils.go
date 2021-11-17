@@ -31,7 +31,7 @@ func resetMaster(client *Client) bool {
 // Returns nil in case no master is set
 func getMasterClient(clients map[*Client]bool) *Client {
 	for client := range clients {
-		if client.master == true {
+		if client.master {
 			return client
 		}
 	}

@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	idRegexp    = regexp.MustCompile("watch\\?v=(?P<VideoId>.+?)\"")
+	idRegexp = regexp.MustCompile("watch\\?v=(?P<VideoId>.+?)\"")
 	// titleRegexp = regexp.MustCompile("title=\"(?P<Title>.+?)\"")
 	titleRegexp = regexp.MustCompile("\"title\":{\"runs\":\\[{\"text\":\"(?P<Title>.+?)\"")
 
@@ -48,7 +48,7 @@ func (list *SearchResultList) AddItem(item SearchResult) []SearchResult {
 func search(searchText string, maxResults string) SearchResultList {
 	searchMaxResults, maxResultsConvErr := strconv.Atoi(maxResults)
 	if maxResultsConvErr != nil {
-		// Do something
+		searchMaxResults = 6
 	}
 	searchText = strings.ReplaceAll(searchText, " ", "+")
 	fullSearchURL := "https://www.youtube.com/results?search_query=" + searchText
@@ -80,7 +80,7 @@ func search(searchText string, maxResults string) SearchResultList {
 		for _, line := range temp {
 			if counter < searchMaxResults {
 				matched, _ := regexp.MatchString(`.*watch\?v`, line)
-				if matched == true {
+				if matched {
 					idMatch := idRegexp.FindStringSubmatch(line)
 					titleMatch := titleRegexp.FindStringSubmatch(line)
 					if strings.Contains(idMatch[1], "start_radio") {
