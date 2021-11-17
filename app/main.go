@@ -52,5 +52,10 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("./static/"))))
 	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir("./parts/"))))
 
-	http.ListenAndServe(":8080", handlers.LoggingHandler(os.Stdout, router))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, router))
 }
