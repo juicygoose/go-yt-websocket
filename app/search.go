@@ -12,7 +12,8 @@ import (
 
 var (
 	idRegexp    = regexp.MustCompile("watch\\?v=(?P<VideoId>.+?)\"")
-	titleRegexp = regexp.MustCompile("title=\"(?P<Title>.+?)\"")
+	// titleRegexp = regexp.MustCompile("title=\"(?P<Title>.+?)\"")
+	titleRegexp = regexp.MustCompile("\"title\":{\"runs\":\\[{\"text\":\"(?P<Title>.+?)\"")
 
 	// SearchVideo is the handler func to perform a search on video provider
 	SearchVideo = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -73,12 +74,12 @@ func search(searchText string, maxResults string) SearchResultList {
 			log.Printf("Error while parsing response body")
 		}
 		bodyString := string(bodyBytes)
-		temp := strings.Split(bodyString, "\n")
+		temp := strings.Split(bodyString, "WEB_PAGE_TYPE_WATCH")
 		counter := 0
 
 		for _, line := range temp {
 			if counter < searchMaxResults {
-				matched, _ := regexp.MatchString(`.*yt-lockup-title.*watch\?v`, line)
+				matched, _ := regexp.MatchString(`.*watch\?v`, line)
 				if matched == true {
 					idMatch := idRegexp.FindStringSubmatch(line)
 					titleMatch := titleRegexp.FindStringSubmatch(line)

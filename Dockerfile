@@ -1,4 +1,4 @@
-FROM golang:1.13-stretch
+FROM golang:1.17.3-stretch
 
 RUN go get github.com/gorilla/handlers
 RUN go get github.com/gorilla/websocket
