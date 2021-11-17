@@ -36,8 +36,10 @@ func exposeNewRoom(router *mux.Router, room *Room) {
 	roomPath := "/" + room.name + "/"
 	roomWebsocket := "/" + room.name + "-websocket"
 
-	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir("./room/"))))
-	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir("./static/"))))
-	router.PathPrefix(roomPath + "parts/").Handler(http.StripPrefix(roomPath+"parts/", http.FileServer(http.Dir("./parts/"))))
+	path := getStaticFilesPath()
+
+	router.Handle(roomPath, http.StripPrefix(roomPath, http.FileServer(http.Dir(path+"/room/"))))
+	router.PathPrefix(roomPath + "static/").Handler(http.StripPrefix(roomPath+"static/", http.FileServer(http.Dir(path+"/static/"))))
+	router.PathPrefix(roomPath + "parts/").Handler(http.StripPrefix(roomPath+"parts/", http.FileServer(http.Dir(path+"/parts/"))))
 	router.Handle(roomWebsocket, Websocket).Methods("GET")
 }

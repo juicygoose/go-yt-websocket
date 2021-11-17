@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"strconv"
 )
 
@@ -59,4 +60,17 @@ func getClientsConnectedMessage(clients map[*Client]bool, client *Client, leavin
 		message = "{\"ClientsConnected\": " + string(strconv.Itoa(len(clients))) + ", \"leavingClientUid\": " + string(strconv.Itoa(client.uid)) + "}"
 	}
 	return []byte(message)
+}
+
+func getStaticFilesPath() string {
+	// If deployed, the static folders are
+	isDeployed := os.Getenv("IS_DEPLOYED")
+	var path string
+	if isDeployed != "" {
+		path = os.Getenv("HOME") + "/app"
+	} else {
+		path = "."
+	}
+
+	return path
 }

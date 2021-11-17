@@ -47,14 +47,7 @@ func main() {
 	router.Handle("/search-video", SearchVideo)
 	router.Handle("/rooms-stats", RoomsStats)
 
-	// If deployed, the static folders are
-	isDeployed := os.Getenv("IS_DEPLOYED")
-	var path string
-	if isDeployed != "" {
-		path = os.Getenv("HOME") + "/app"
-	} else {
-		path = "."
-	}
+	path := getStaticFilesPath()
 
 	// Root path for landing page
 	router.Handle("/", http.FileServer(http.Dir(path+"/home/")))
