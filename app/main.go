@@ -54,6 +54,9 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+"/static/"))))
 	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir(path+"/parts/"))))
 
+	// Acme challenge for let's encrypt certificate
+	router.PathPrefix("/.well-known/acme-challenge/").Handler(http.StripPrefix("/acme-challenge/", http.FileServer(http.Dir(path+"/acme-challenge/"))))
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
