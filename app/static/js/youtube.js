@@ -470,6 +470,11 @@ function onSearchResponse(response) {
 
   for (var i = 0; i < results.length; i++) {
     var result = results[i];
+
+    // Escape quote else it will mess with processing
+    // of onclick functions later on
+    result.Title = result.Title.replace(/'/g, " ");
+
     if (master) {
       document.getElementById("response").innerHTML += newVideoRow(
         result.ID,
