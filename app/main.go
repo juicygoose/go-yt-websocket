@@ -43,9 +43,17 @@ func main() {
 		w.Write(byteResults)
 	})
 
+	// Expose Acme Challenge
+	var ExposeAcmeChallenge = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("aqXPXyrez9loja_eF9C5ezf5MrQRG-E4OSQnWsIqXw0.hom1I0XD-mW1TC3-ZqMYuQT-ClTsOIiU2ywy1LWrOJU"))
+	})
+
 	router.Handle("/expose-room", ExposeNewRoom)
 	router.Handle("/search-video", SearchVideo)
 	router.Handle("/rooms-stats", RoomsStats)
+
+	// Expose Acme Challenge
+	router.Handle("/.well-known/acme-challenge/aqXPXyrez9loja_eF9C5ezf5MrQRG-E4OSQnWsIqXw0", ExposeAcmeChallenge)
 
 	path := getStaticFilesPath()
 
@@ -55,7 +63,6 @@ func main() {
 	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir(path+"/parts/"))))
 
 	// Acme challenge for let's encrypt certificate
-	router.PathPrefix("/.well-known/acme-challenge/").Handler(http.StripPrefix("/acme-challenge/", http.FileServer(http.Dir(path+"/acme-challenge/"))))
 
 	port := os.Getenv("PORT")
 	if port == "" {
