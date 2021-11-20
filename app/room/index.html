@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hacienda Warehouse Project</title>
+    <!-- <link rel="stylesheet" href="static/css/index.css"> -->
     <link rel="stylesheet" href="static/css/chat.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="icon" href="/static/assets/favicon.ico" type="image/x-icon"/>
@@ -36,14 +37,14 @@
                     <div id="recordShelfPanel"></div>
                 </div>
                 <div class="tile is-parent has-text-centered is-vertical">
-                  <article class="tile is-child notification is-primary">
+                  <article class="tile is-child notification is-primary has-background-primary-dark">
                     <div class="container">
                         <div id="player"></div>
                         <div class="tile is-parent has-text-centered">
-                            <article class="tile is-child notification is-primary" id="numberOfTracksNext">
+                            <article class="tile is-child notification is-primary has-background-primary-dark" id="numberOfTracksNext">
                                 <span class="tag is-light">0 track(s) playing next</span>
                             </article>
-                            <article class="tile is-child notification is-primary" id="masterStatus">
+                            <article class="tile is-child notification is-primary has-background-primary-dark" id="masterStatus">
                                 <button class="button is-warning" onclick="requestMaster()">
                                     Ask to DJ
                                 </button>
@@ -52,12 +53,12 @@
                                     Keep playlist from previous DJ
                                 </label>
                             </article>
-                            <article class="tile is-child notification is-primary">
-                                <span class="tag is-light" id="clientsConnected">1 guy(s) connected</span>
+                            <article class="tile is-child notification is-primary has-background-primary-dark">
+                                <span class="tag is-light" id="clientsConnected">1 💃🕺 connected</span>
                             </article>   
                         </div>
                         <div class="tile is-parent has-text-centered">
-                            <article class="tile is-child notification is-primary">
+                            <article class="tile is-child notification is-primary has-background-primary-dark">
                                 <button class="button is-info" onclick="triggerVote('up')" id="upvote">Yeaah 🎉 0</button>
                                 <button class="button is-danger" onclick="triggerVote('down')" id="downvote">0 ☠️ Bweerk</button>
                             </article>
@@ -86,10 +87,10 @@
         </div>
     </div>
   </section>
-  <footer class="footer has-background-primary">
+  <footer class="footer has-background-primary-dark has-text-white">
     <div class="content has-text-centered">
       <p>
-        🔥 <strong>Hacienda</strong> by Alex.
+        🔥 <strong class="has-text-white">Hacienda Warehouse Project</strong>, made with 💛 by Alex.
       </p>
     </div>
   </footer>

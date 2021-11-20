@@ -15,6 +15,18 @@ var upvote = 0;
 var downvote = 0;
 var guestList = [];
 const uid = Math.floor(100000 + Math.random() * 900000);
+var youtubePlayerWidth = "550";
+var youtubePlayerHeight = "330";
+
+$(window).resize(function () {
+  if ($(window).width() < 640) {
+    document.getElementById("player").width = "390";
+    document.getElementById("player").height = "230";
+  } else {
+    document.getElementById("player").width = youtubePlayerWidth;
+    document.getElementById("player").height = youtubePlayerHeight;
+  }
+});
 
 function setTagNumberOfTracks() {
   document.getElementById(
@@ -197,7 +209,7 @@ socket.onmessage = function (e) {
   if (obj.ClientsConnected) {
     document.getElementById(
       "clientsConnected"
-    ).innerHTML = `${obj.ClientsConnected} guy(s) connected`;
+    ).innerHTML = `${obj.ClientsConnected} 💃🕺 connected`;
     if (obj.leavingClientUid && obj.leavingClientUid > 0) {
       guestList = guestList.filter(function removeGuestById(guest) {
         return guest.uid !== obj.leavingClientUid;
@@ -414,8 +426,8 @@ var player;
 var youtubeId;
 function onYouTubeIframeAPIReady() {
   player = new YT.Player("player", {
-    height: "330",
-    width: "550",
+    height: youtubePlayerHeight,
+    width: youtubePlayerWidth,
     videoId: youtubeVideoId,
     events: {
       onReady: onPlayerReady,
