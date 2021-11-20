@@ -19,14 +19,14 @@ const uid = Math.floor(100000 + Math.random() * 900000);
 var youtubePlayerWidth = "550";
 var youtubePlayerHeight = "330";
 if ($(window).width() < 640) {
-  youtubePlayerWidth = "390";
-  youtubePlayerHeight = "230";
+  youtubePlayerWidth = "330";
+  youtubePlayerHeight = "180";
 }
 
 $(window).resize(function () {
   if ($(window).width() < 640) {
-    document.getElementById("player").width = "390";
-    document.getElementById("player").height = "230";
+    document.getElementById("player").width = "330";
+    document.getElementById("player").height = "180";
   } else {
     document.getElementById("player").width = youtubePlayerWidth;
     document.getElementById("player").height = youtubePlayerHeight;
