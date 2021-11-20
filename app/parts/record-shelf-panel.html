@@ -14,7 +14,7 @@
     <div class="content" id="track-toolbox-search">
         <a class="panel-block is-active is-fullwidth">
             <p class="control has-icons-left">
-                <input class="input is-primary" id="query" type="text" placeholder="Find a track 💃🏼" onkeypress="search(event)">
+                <input class="input is-primary" id="query" type="text" placeholder="Find a track 💃🏼" onkeypress="searchOnEnter(event)" onkeyup="searchOnKeyUp(event)">
                 <span class="icon is-left">
                     <i class="fas fa-search" aria-hidden="true"></i>
                 </span>

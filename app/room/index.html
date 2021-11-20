@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Hacienda Warehouse Project</title>
-    <!-- <link rel="stylesheet" href="static/css/index.css"> -->
+    <link rel="stylesheet" href="static/css/modal.css">
     <link rel="stylesheet" href="static/css/chat.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <link rel="icon" href="/static/assets/favicon.ico" type="image/x-icon"/>
@@ -42,15 +42,15 @@
                         <div id="player"></div>
                         <div class="tile is-parent has-text-centered">
                             <article class="tile is-child notification is-primary has-background-primary-dark" id="numberOfTracksNext">
-                                <span class="tag is-light">0 track(s) playing next</span>
+                                <span class="tag is-light">0 📀 playing next</span>
                             </article>
                             <article class="tile is-child notification is-primary has-background-primary-dark" id="masterStatus">
-                                <button class="button is-warning" onclick="requestMaster()">
-                                    Ask to DJ
+                                <button class="button is-primary has-text-weight-bold" onclick="requestMaster()">
+                                    I want to DJ !
                                 </button>
-                                <label class="checkbox">
+                                <label class="checkbox has-text-white mt-2">
                                     <input type="checkbox" id="keepPreviousPlaylistCheckbox">
-                                    Keep playlist from previous DJ
+                                    Tick if you want to keep previous DJ's playlist
                                 </label>
                             </article>
                             <article class="tile is-child notification is-primary has-background-primary-dark">
@@ -59,8 +59,8 @@
                         </div>
                         <div class="tile is-parent has-text-centered">
                             <article class="tile is-child notification is-primary has-background-primary-dark">
-                                <button class="button is-info" onclick="triggerVote('up')" id="upvote">Yeaah 🎉 0</button>
-                                <button class="button is-danger" onclick="triggerVote('down')" id="downvote">0 ☠️ Bweerk</button>
+                                <button class="button is-info has-text-weight-semibold mr-2" onclick="triggerVote('up')" id="upvote">Yeaah 🎉 0</button>
+                                <button class="button is-danger has-text-weight-semibold ml-2" onclick="triggerVote('down')" id="downvote">0 ☠️ Bweerk</button>
                             </article>
                         </div>
                     </div>

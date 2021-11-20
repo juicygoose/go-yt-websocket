@@ -48,7 +48,7 @@ func (list *SearchResultList) AddItem(item SearchResult) []SearchResult {
 func search(searchText string, maxResults string) SearchResultList {
 	searchMaxResults, maxResultsConvErr := strconv.Atoi(maxResults)
 	if maxResultsConvErr != nil {
-		searchMaxResults = 6
+		searchMaxResults = 8
 	}
 	searchText = strings.ReplaceAll(searchText, " ", "+")
 	fullSearchURL := "https://www.youtube.com/results?search_query=" + searchText
@@ -79,14 +79,13 @@ func search(searchText string, maxResults string) SearchResultList {
 
 		for _, line := range temp {
 			if counter < searchMaxResults {
-				matched, _ := regexp.MatchString(`.*watch\?v`, line)
-				if matched {
-					idMatch := idRegexp.FindStringSubmatch(line)
+				idMatch := idRegexp.FindStringSubmatch(line)
+				if idMatch != nil {
 					titleMatch := titleRegexp.FindStringSubmatch(line)
 					if strings.Contains(idMatch[1], "start_radio") {
 						continue
 					}
-					if idMatch != nil && titleMatch != nil {
+					if titleMatch != nil {
 						item := SearchResult{ID: idMatch[1], Title: titleMatch[1]}
 						searchResults.AddItem(item)
 					}

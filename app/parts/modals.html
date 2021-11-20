@@ -16,14 +16,36 @@
 <div class="modal is-active" id="nameInput">
     <div class="modal-background"></div>
     <div class="modal-card">
-      <header class="modal-card-head">
-        <p class="modal-card-title">Hey! Let's add your name to the guest list 💃🏼</p>
+      <header class="modal-card-head has-background-primary-dark">
+        <p class="modal-card-title has-text-weight-bold has-text-white">Welcome to the party.</p>
       </header>
-      <section class="modal-card-body">
-        <input class="input is-success" type="text" placeholder="Your name  👻" id="guestName" onkeypress="enterKeyboard(event)">
+      <section class="hero has-background is-transparent">
+        <img src="static/assets/voyageur-bg.png" class="hero-background is-transparent">
+        <section class="modal-card-body">
+          <div class="hero-body">
+            <div class="container has-text-white has-text-weight-bold mt-6">
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              <br />
+              In this room, you will be able to DJ and listen to others while they DJ !
+              While not DJing, you can recommend tracks to the DJ 💃🏼
+              <br />
+              <br />
+              Have fun out there 🍃
+            </div>
+          </div>
+        </section>
+        <section class="modal-card-body">
+          <input class="input is-success" type="text" placeholder="What's your name ?  👻" id="guestName" onkeypress="enterKeyboard(event)">
+        </section>
       </section>
-      <footer class="modal-card-foot">
-        <button class="button is-success" onclick="enterRoom()">Enter room</button>
+      <footer class="modal-card-foot has-background-primary-dark">
+        <button class="button is-success is-light" onclick="enterRoom()">Enter room</button>
       </footer>
     </div>
   </div>

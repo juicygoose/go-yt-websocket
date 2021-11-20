@@ -15,8 +15,13 @@ var upvote = 0;
 var downvote = 0;
 var guestList = [];
 const uid = Math.floor(100000 + Math.random() * 900000);
+
 var youtubePlayerWidth = "550";
 var youtubePlayerHeight = "330";
+if ($(window).width() < 640) {
+  youtubePlayerWidth = "390";
+  youtubePlayerHeight = "230";
+}
 
 $(window).resize(function () {
   if ($(window).width() < 640) {
@@ -31,7 +36,7 @@ $(window).resize(function () {
 function setTagNumberOfTracks() {
   document.getElementById(
     "numberOfTracksNext"
-  ).innerHTML = `<span class="tag is-light">${nextVideos.length} track(s) playing next</span>`;
+  ).innerHTML = `<span class="tag is-light">${nextVideos.length} 📀 playing next</span>`;
   document.getElementById(
     "tracksInPlaylist"
   ).innerHTML = `${nextVideos.length}`;
@@ -62,7 +67,7 @@ socket.onmessage = function (e) {
     }
     document.getElementById(
       "masterStatus"
-    ).innerHTML = `<span class="tag is-info is-medium">You are the DJ</span>`;
+    ).innerHTML = `<span class="tag is-info is-medium has-text-weight-bold">You are the DJ</span>`;
     setTagNumberOfTracks();
     refreshCue();
     var masterId = {
@@ -74,12 +79,12 @@ socket.onmessage = function (e) {
   if (obj.YouAreNotMaster) {
     master = false;
     document.getElementById("masterStatus").innerHTML = `
-        <button class="button is-warning" onclick="requestMaster()">
-            Ask to DJ
+        <button class="button is-primary has-text-weight-bold" onclick="requestMaster()">
+            I want to DJ !
         </button>
-        <label class="checkbox">
+        <label class="checkbox has-text-white mt-2">
             <input type="checkbox" id="keepPreviousPlaylistCheckbox">
-            Keep playlist from previous DJ
+            Tick if you want to keep previous DJ's playlist
         </label>
         `;
     // Get playlist in case it was reset by new master
@@ -453,13 +458,12 @@ function onPlayerStateChange(event) {
   socket.send('{"playerState": ' + event.data + "}");
 }
 
-// Called when the search button is clicked in the html code
-function search(event) {
-  if (event.which == 13 || event.keyCode == 13) {
-    var query = document.getElementById("query").value;
+function search() {
+  var query = document.getElementById("query").value;
+  if (query) {
     var formattedSearchQuery = query.replace(new RegExp(" ", "g"), "+");
 
-    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=6`;
+    var url = `${http_protocol}://${hostname}:${port}/search-video?search_query=${formattedSearchQuery}&max_results=8`;
     var request = new XMLHttpRequest();
     request.open("GET", url, true);
     request.onload = function () {
@@ -473,6 +477,27 @@ function search(event) {
     request.send();
     document.getElementById("query").value = "";
   }
+}
+
+// Called when the search button is clicked in the html code
+function searchOnEnter(event) {
+  if (event.which == 13 || event.keyCode == 13) {
+    search();
+  }
+}
+
+// Search also when user not been typing for a while
+//setup before functions
+let typingTimer; //timer identifier
+let doneTypingInterval = 2000; //time in ms
+function searchOnKeyUp(event) {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(doneTyping, doneTypingInterval);
+}
+
+//user is "finished typing," do something
+function doneTyping() {
+  search();
 }
 
 function onSearchResponse(response) {
