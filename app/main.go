@@ -54,9 +54,17 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+"/static/"))))
 	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir(path+"/parts/"))))
 
+
+	// Get PORT env var defined in deployed heroku environments
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
+	} else {
+		// If deployed in heroku and not local
+		// Redirect http to https
+		go http.ListenAndServe(":80", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, "https://"+r.Host+r.URL.String(), http.StatusMovedPermanently)
+		}))
 	}
 
 	http.ListenAndServe(":"+port, handlers.LoggingHandler(os.Stdout, router))
