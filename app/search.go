@@ -26,6 +26,17 @@ var (
 		byteResults, _ := json.Marshal(searchResults)
 		w.Write(byteResults)
 	})
+
+	GetPlaylist = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		playlistUrl := r.FormValue("url")
+
+		if playlistUrl == "" {
+			log.Printf("Missing mandatory search parameters")
+		}
+		playlistResults := searchByURL(playlistUrl, 100)
+		byteResults, _ := json.Marshal(playlistResults)
+		w.Write(byteResults)
+	})
 )
 
 // SearchResult represents a video fetched from search
@@ -45,16 +56,9 @@ func (list *SearchResultList) AddItem(item SearchResult) []SearchResult {
 	return list.Items
 }
 
-func search(searchText string, maxResults string) SearchResultList {
-	searchMaxResults, maxResultsConvErr := strconv.Atoi(maxResults)
-	if maxResultsConvErr != nil {
-		searchMaxResults = 8
-	}
-	searchText = strings.ReplaceAll(searchText, " ", "+")
-	fullSearchURL := "https://www.youtube.com/results?search_query=" + searchText
-
+func searchByURL(url string, searchMaxResults int) SearchResultList {
 	client := &http.Client{}
-	searchReq, err := http.NewRequest("GET", fullSearchURL, nil)
+	searchReq, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Printf("Error while creating Search request")
 	}
@@ -85,8 +89,14 @@ func search(searchText string, maxResults string) SearchResultList {
 					if strings.Contains(idMatch[1], "start_radio") {
 						continue
 					}
+					// Remove weird info coming from search in playlist
+					id := strings.Split(idMatch[1], "\\u0026list")[0]
 					if titleMatch != nil {
-						item := SearchResult{ID: idMatch[1], Title: titleMatch[1]}
+						// Remove a weird title added in case we look for playlists
+						if strings.Contains(titleMatch[1], "YouTube TV") {
+							continue
+						}
+						item := SearchResult{ID: id, Title: titleMatch[1]}
 						searchResults.AddItem(item)
 					}
 
@@ -99,4 +109,15 @@ func search(searchText string, maxResults string) SearchResultList {
 		}
 	}
 	return searchResults
+}
+
+func search(searchText string, maxResults string) SearchResultList {
+	searchMaxResults, maxResultsConvErr := strconv.Atoi(maxResults)
+	if maxResultsConvErr != nil {
+		searchMaxResults = 8
+	}
+	searchText = strings.ReplaceAll(searchText, " ", "+")
+	fullSearchURL := "https://www.youtube.com/results?search_query=" + searchText
+
+	return searchByURL(fullSearchURL, searchMaxResults)
 }

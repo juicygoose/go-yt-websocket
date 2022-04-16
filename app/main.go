@@ -45,6 +45,7 @@ func main() {
 
 	router.Handle("/expose-room", ExposeNewRoom)
 	router.Handle("/search-video", SearchVideo)
+	router.Handle("/playlist", GetPlaylist)
 	router.Handle("/rooms-stats", RoomsStats)
 
 	path := getStaticFilesPath()
@@ -53,7 +54,6 @@ func main() {
 	router.Handle("/", http.FileServer(http.Dir(path+"/home/")))
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(path+"/static/"))))
 	router.PathPrefix("/parts/").Handler(http.StripPrefix("/parts/", http.FileServer(http.Dir(path+"/parts/"))))
-
 
 	// Get PORT env var defined in deployed heroku environments
 	port := os.Getenv("PORT")

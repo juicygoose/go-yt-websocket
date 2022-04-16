@@ -45,6 +45,14 @@
         </a>
     </div>
     <div class="content" id="track-toolbox-playlist" style="display: none;">
+        <a class="panel-block is-active is-fullwidth">
+            <p class="control has-icons-left">
+                <input class="input is-primary" id="playlist-query" type="text" placeholder="Import a playlist from URL 📀" onkeypress="fetchPlaylistOnEnter(event)">
+                <span class="icon is-left">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                </span>
+            </p>
+        </a>
         <a class="panel-block">
             <div class="table-container">
                 <table class="table is-scrollable is-narrow is-striped is-primary is-fullwidth is-hoverable">

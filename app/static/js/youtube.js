@@ -56,7 +56,15 @@ socket.onopen = function () {
 };
 
 socket.onmessage = function (e) {
-  var obj = JSON.parse(e.data);
+  var obj;
+  try {
+    obj = JSON.parse(e.data);
+  } catch (error) {
+    console.log("decoded KO", e.data, error);
+    return;
+  }
+
+  console.log("decoded OK", obj);
   if (obj.YouAreMaster) {
     master = true;
     if (document.getElementById("keepPreviousPlaylistCheckbox").checked) {
@@ -185,6 +193,12 @@ socket.onmessage = function (e) {
       setTagNumberOfTracks();
     }
   }
+  if (obj.cueVideoList) {
+    console.log("adding list");
+    nextVideos.push(...obj.list);
+    refreshCue();
+    setTagNumberOfTracks();
+  }
   if (obj.chatText) {
     text = obj.chatText;
     name = obj.clientName;
@@ -304,6 +318,12 @@ function cueNewVideoId(id, title, remove = false) {
     remove: remove,
   };
   socket.send(JSON.stringify(videoIdSocketMsg));
+}
+
+function cueNewVideoList(list) {
+  var videoListSocketMsg = { cueVideoList: true, list: list };
+  console.log("sendinglist", videoListSocketMsg);
+  socket.send(JSON.stringify(videoListSocketMsg));
 }
 
 function changeVideo(videoToPlay, playTime = 0) {
@@ -456,6 +476,43 @@ function onPlayerReady(event) {
 //    the player should play for six seconds and then stop.
 function onPlayerStateChange(event) {
   socket.send('{"playerState": ' + event.data + "}");
+}
+
+function fetchPlaylist() {
+  var query = document.getElementById("playlist-query").value;
+  var url = `${http_protocol}://${hostname}:${port}/playlist?url=${query}`;
+  var request = new XMLHttpRequest();
+  request.open("GET", url, true);
+  request.onload = function () {
+    var data = JSON.parse(this.response);
+    if (request.status >= 200 && request.status < 400) {
+      results = data.Items;
+      var videoList = [];
+      for (var i = 0; i < results.length; i++) {
+        var result = results[i];
+        result.Title = result.Title.replace(/'/g, " ");
+        // cueNewVideoId(result.ID, result.Title);
+        videoList.push({
+          cueVideoId: result.ID,
+          cueVideoTitle: result.Title,
+          remove: false,
+        });
+      }
+      cueNewVideoList(videoList);
+    } else {
+      console.log("Error searching videos");
+    }
+  };
+  request.send();
+
+  refreshCue();
+  document.getElementById("playlist-query").value = "";
+}
+
+function fetchPlaylistOnEnter(event) {
+  if (event.which == 13 || event.keyCode == 13) {
+    fetchPlaylist();
+  }
 }
 
 function search() {
