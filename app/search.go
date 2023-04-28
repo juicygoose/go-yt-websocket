@@ -90,12 +90,15 @@ func searchByURL(url string, searchMaxResults int) SearchResultList {
 						continue
 					}
 					// Remove weird info coming from search in playlist
-					id := strings.Split(idMatch[1], "\\u0026list")[0]
+					id := strings.Split(idMatch[1], "\\u0026")[0]
 					if titleMatch != nil {
 						// Remove a weird title added in case we look for playlists
 						if strings.Contains(titleMatch[1], "YouTube TV") {
 							continue
 						}
+						// log.Printf(id)
+						// 6Tervjj--QI
+						// log.Printf(titleMatch[0])
 						item := SearchResult{ID: id, Title: titleMatch[1]}
 						searchResults.AddItem(item)
 					}
