@@ -3,49 +3,54 @@
     <div class="modal-content">
         <article class="message is-primary">
             <div class="message-header">
-              <p>Access restricted to the DJ!</p>
+                <p>Access restricted to the DJ!</p>
             </div>
             <div class="message-body">
-              Request to be DJ to start adding tracks to the playlist and get recommendations from the crowd.
+                Request to be DJ to start adding tracks to the playlist and get
+                recommendations from the crowd.
             </div>
-          </article>
+        </article>
     </div>
-    <button class="modal-close is-large" aria-label="close" onclick="toggleModal()"></button>
+    <button
+        class="modal-close is-large"
+        aria-label="close"
+        onclick="toggleModal()"
+    ></button>
 </div>
 
 <div class="modal is-active" id="nameInput">
     <div class="modal-background"></div>
     <div class="modal-card">
-      <header class="modal-card-head has-background-primary-dark">
-        <p class="modal-card-title has-text-weight-bold has-text-white">Welcome to the party.</p>
-      </header>
-      <section class="hero has-background is-transparent">
-        <img src="static/assets/voyageur-bg.png" class="hero-background is-transparent">
-        <section class="modal-card-body">
-          <div class="hero-body">
-            <div class="container has-text-white has-text-weight-bold mt-6">
-              <br />
-              <br />
-              <br />
-              <br />
-              <br />
-              <br />
-              <br />
-              <br />
-              In this room, you will be able to DJ and listen to others while they DJ !
-              While not DJing, you can recommend tracks to the DJ 💃🏼
-              <br />
-              <br />
-              Have fun out there 🍃
-            </div>
-          </div>
+        <header class="modal-card-head has-background-primary-dark">
+            <p class="modal-card-title has-text-weight-bold has-text-white">
+                Welcome to the party.
+            </p>
+        </header>
+        <section class="hero">
+            <section class="modal-card-body">
+                In this room, you will be able to DJ and listen to others while
+                they DJ ! While not DJing, you can recommend tracks to the DJ 💃🏼
+                <br />
+                <br />
+                Have fun out there 🍃
+                <br />
+                <br />
+                How would you like to be called?
+                <br />
+                <br />
+                <input
+                    class="input is-success"
+                    type="text"
+                    placeholder="Alex 👻"
+                    id="guestName"
+                    onkeypress="enterKeyboard(event)"
+                />
+            </section>
         </section>
-        <section class="modal-card-body">
-          <input class="input is-success" type="text" placeholder="What's your name ?  👻" id="guestName" onkeypress="enterKeyboard(event)">
-        </section>
-      </section>
-      <footer class="modal-card-foot has-background-primary-dark">
-        <button class="button is-success is-light" onclick="enterRoom()">Enter room</button>
-      </footer>
+        <footer class="modal-card-foot has-background-primary-dark">
+            <button class="button is-success is-light" onclick="enterRoom()">
+                Enter room
+            </button>
+        </footer>
     </div>
-  </div>
+</div>

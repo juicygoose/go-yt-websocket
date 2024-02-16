@@ -47,7 +47,7 @@ func (h *Hub) run() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			sendMessageToAllClients(h.clients, getClientsConnectedMessage(h.clients, client, false))
+			setMasterClientIfNil(h.clients, client)
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)

@@ -34,12 +34,10 @@ $(window).resize(function () {
 });
 
 function setTagNumberOfTracks() {
-  document.getElementById(
-    "numberOfTracksNext"
-  ).innerHTML = `<span class="tag is-light">${nextVideos.length} 📀 playing next</span>`;
-  document.getElementById(
-    "tracksInPlaylist"
-  ).innerHTML = `${nextVideos.length}`;
+  document.getElementById("numberOfTracksNext").innerHTML =
+    `<span class="tag is-light">${nextVideos.length} 📀 playing next</span>`;
+  document.getElementById("tracksInPlaylist").innerHTML =
+    `${nextVideos.length}`;
 }
 
 // Handle local dev cases
@@ -66,6 +64,7 @@ socket.onmessage = function (e) {
 
   console.log("decoded OK", obj);
   if (obj.YouAreMaster) {
+    console.log("you are master");
     master = true;
     if (document.getElementById("keepPreviousPlaylistCheckbox").checked) {
       document.getElementById("output").innerHTML += "Keeping playlist";
@@ -73,9 +72,8 @@ socket.onmessage = function (e) {
       document.getElementById("output").innerHTML += "Resetting playlist";
       nextVideos = [];
     }
-    document.getElementById(
-      "masterStatus"
-    ).innerHTML = `<span class="tag is-info is-medium has-text-weight-bold">You are the DJ</span>`;
+    document.getElementById("masterStatus").innerHTML =
+      `<span class="tag is-info is-medium has-text-weight-bold">You are the DJ</span>`;
     setTagNumberOfTracks();
     refreshCue();
     var masterId = {
@@ -104,7 +102,7 @@ socket.onmessage = function (e) {
       `Someone is requesting to DJ!
         <button class="button is-warning is-outlined is-fullwidth is-small" onclick="socket.send(JSON.stringify({'masterAccepted': true}))">
             Accept
-        </button>`
+        </button>`,
     );
   }
   if (obj.readonlyGetPlayerState) {
@@ -226,9 +224,8 @@ socket.onmessage = function (e) {
     }
   }
   if (obj.ClientsConnected) {
-    document.getElementById(
-      "clientsConnected"
-    ).innerHTML = `${obj.ClientsConnected} 💃🕺 connected`;
+    document.getElementById("clientsConnected").innerHTML =
+      `${obj.ClientsConnected} 💃🕺 connected`;
     if (obj.leavingClientUid && obj.leavingClientUid > 0) {
       guestList = guestList.filter(function removeGuestById(guest) {
         return guest.uid !== obj.leavingClientUid;
@@ -238,6 +235,8 @@ socket.onmessage = function (e) {
   }
   if (obj.newGuestInfo) {
     guestList.push({ name: obj.name, uid: obj.uid });
+    document.getElementById("clientsConnected").innerHTML =
+      `${guestList.length} 💃🕺 connected`;
     refreshGuestList();
   }
   if (obj.guestList) {
@@ -368,7 +367,7 @@ function refreshSuggestions() {
   suggestions.forEach(function displaySuggestion(obj) {
     document.getElementById("suggestions").innerHTML += newVideoRow(
       obj.readonlySuggestedVideoId,
-      obj.title
+      obj.title,
     );
   });
   document.getElementById("tracksInReco").innerHTML = `${suggestions.length}`;
@@ -379,7 +378,7 @@ function refreshCue() {
   nextVideos.forEach(function displayCue(obj) {
     document.getElementById("playlist-table").innerHTML += newVideoInPlaylist(
       obj.cueVideoId,
-      obj.cueVideoTitle
+      obj.cueVideoTitle,
     );
   });
 }
@@ -572,7 +571,7 @@ function onSearchResponse(response) {
     if (master) {
       document.getElementById("response").innerHTML += newVideoRow(
         result.ID,
-        result.Title
+        result.Title,
       );
     } else {
       document.getElementById("response").innerHTML += `

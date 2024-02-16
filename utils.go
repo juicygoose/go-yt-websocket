@@ -39,6 +39,20 @@ func getMasterClient(clients map[*Client]bool) *Client {
 	return nil
 }
 
+func setMasterClientIfNil(clients map[*Client]bool, client *Client) bool {
+	log.Printf("Entering default master setup")
+	masterClient := getMasterClient(clients)
+	if masterClient != nil {
+		return false
+	}
+	log.Printf("no master found, setting one up...")
+	for client := range clients {
+		setClientAsMaster(client)
+		return true
+	}
+	return false
+}
+
 // Loop on all clients and send them message in input
 func sendMessageToAllClients(clients map[*Client]bool, message []byte) {
 	for client := range clients {
