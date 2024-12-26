@@ -1,6 +1,6 @@
 module hacienda.juicytech.com/m/v2
 
-go 1.17
+go 1.22.4
 
 require (
 	github.com/gorilla/handlers v1.5.1
